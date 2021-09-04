@@ -1,0 +1,104 @@
+<div class="d-flex toggled" id="wrapper">
+
+    <%- include('./partials/sidebar.ejs') %>
+
+    <div id="page-content-wrapper">
+        <div id="container" class="container-fluid" style="margin-top: 16px">
+            <div class="row">
+              <div class="col-2"></div>
+              <div class="col-8 mx-auto">
+                <div>
+                  <center>
+                    <legend>Select Resources for Collection Generation</legend>
+                  </center>
+                </div>
+                <form action="/resources/createCollection" method="POST">
+                  <div class="card card-body">
+                    <div class="form-group row">
+                      <div class="col-sm-2">
+                        <label for="collectionName" class="col-form-label">Collection Name</label>
+                      </div>
+                      <div class="col-sm-8">
+                        <input type="text" class="form-control" name="collectionName" placeholder="Enter resource collection name" required="true" />
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <div class="col-sm-2">
+                        <label for="collectionDescription" class="col-form-label">Collection Description</label>
+                      </div>
+                      <div class="col-sm-8">
+                        <input type="text" class="form-control" name="collectionDescription" placeholder="Enter resource collection description"
+                          required="true" />
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <div class="col-sm-2">
+                        <label for="collectionTags" class="col-form-label">Collection Tags</label>
+                      </div>
+                      <div class="col-sm-8">
+                        <input type="text" class="form-control" name="collectionTags"
+                          placeholder="Enter resource collection tags" required="true" />
+                      </div>
+                    </div>
+                  </div>
+          
+                  <div id="resource">
+                    <% resourceList.forEach((resource,index) => { %>
+                    <div class="form-check" id="resource-div-<%-index%>">
+                      <input id="resource-<%= index %>" class="form-check-input" type="checkbox" name="resources"
+                        value="<%=resource.resourceName%>" />
+                      <div class="card border-dark mb-8" id="resourceCard" style="margin-top: 20px; margin-bottom: 20px">
+                        <div class="card-body">
+                          <h4 class="card-title" style="margin-bottom: 0.01rem">
+                            <%= resource.resourceName %>
+                          </h4>
+                          <% var tagString = ""; %>
+                          <% for (var i = 0; i < resource.resourceTags.length; i++){ %>
+                                <%  if (i > 0){ tagString += ", "; } %>
+                                <% tagString += resource.resourceTags[i].tagName %>
+                          <% } %>
+                          <p class="card-text">
+                            Resource Type: <%= resource.resourceType %>
+                          </p>
+                          <p class="card-text" style="margin-bottom: 0.01rem">
+                            <% if(resource.resourceDescription.length > 20) { %>
+                            <%= resource.resourceDescription.substring(0, 100) +
+                            "..." %> <% } else{ %> <%=
+                            resource.resourceDescription %> <% } %>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <% }); %>
+                  </div>
+                  <button type="button" id="select-all-resources" class="btn btn-round btn-outline-primary my-2 my-sm-0" >Select All</button>
+                  <button type="button" id="clear-all-resources" class="btn btn-round btn-outline-primary my-2 my-sm-0">Clear All</button>
+                  <center style="margin-top: 16px; margin-bottom: 16px">
+                    <input type="submit" value="Generate Collection" class="btn btn-primary" />
+                  </center>
+                </form>
+              </div>
+              <div class="col-2"></div>
+            </div>
+          </div>
+    </div>
+
+</div>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script>
+$("#select-all-resources").click((e) => {
+  var checkboxes = document.getElementsByClassName('form-check-input');
+  
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = true;
+  }
+});
+
+$("#clear-all-resources").click((e) => {
+  var checkboxes = document.getElementsByClassName('form-check-input');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = false;
+  }
+});  
+</script>  

@@ -1,0 +1,576 @@
+<div class="d-flex " id="wrapper">
+    <!--Page content-->
+<div class="discussion">
+    <!-- Discussion Header -->
+    <% if(discussion.dtype === "resource"){ %>
+        <a href="/discussions/r/<%=discussion.res_id%>">Other Discussions</a>
+    <% } else { %>
+        <a href="/discussions/p/<%=discussion.res_id%>">Other Discussions</a>
+    <% } %>
+    <h4 style="font-family: 'Langar';"><%= discussion.title %></h4>
+    <hr>
+    <div class="discussion-header">
+
+        <!-- Question -->
+        <pre style='white-space:pre-wrap'><h4 style="font-family: 'Langar';" ><%= discussion.question %></h4></pre>
+
+        <!-- Post Info -->
+        <div class="discussion-info">
+            <!-- Upvote Button -->
+            <% if(discussion.votes.indexOf(user._id) === -1){ %>
+                <button class="upvote-question upques<%= discussion._id %> " value="<%= discussion._id %>"><i class="fas fa-arrow-up"></i></button>
+            <% } else {%>
+                <button class="upvote-question upques<%= discussion._id %> hidden" value="<%= discussion._id %>"><i class="fas fa-arrow-up"></i></button>
+            <% } %>    
+
+            <!-- Unvote Button -->
+            <% if(discussion.votes.indexOf(user._id) === -1){ %>
+                <button class="upvote-question upques<%= discussion._id %> hidden" value="<%= discussion._id %>"><i class="fas fa-arrow-down"></i></button>
+            <% } else {%>
+                <button class="upvote-question upques<%= discussion._id %>" value="<%= discussion._id %>"><i class="fas fa-arrow-down"></i></button>
+            <% } %>  
+
+            <span class="question" id="<%= discussion._id %>">
+                <%= discussion.votes.length %> points 
+            </span>   
+            | by <%= discussion.username %>  | <span class="ques_time"></span> | last update: <span class="last_time"></span>
+
+        </div>
+    </div>
+
+    <!-- Add Answer Field -->
+    <button type="submit" class="btn btn-discussion btn-answer btn-round btn-outline-primary my-2">Add Answer</button>
+    <div class="answer-field hidden">
+        <form action="/discussions/<%=discussion._id%>/answer" method="POST">
+            <div class="form-group">
+                <label for="Answer">Add Answer</label>
+                <textarea class="form-control" name="answer" style='white-space:pre-wrap' required></textarea>
+                <button type="submit" class="btn btn-discussion btn-round btn-outline-primary my-2 my-sm-0">Answer</button>
+            </div>
+        </form>
+    </div>
+
+    <hr>
+
+    <!-- Answers -->
+    <!-- Map object and its id -->
+    <% 
+        let answerMap = new Map();
+        let commentMap = new Map();
+    %>
+    <div class="answers-container">
+        <h4 class="answers-section">Answers(<%= discussion.answers.length %>)</h4>
+        <% for(let answer of discussion.answers) { %>
+            <!-- Mapping object and its id -->
+            <% answerMap[answer._id] = answer %>
+                
+            <!-- Answer Body -->
+            <pre style='white-space:pre-wrap'><p class="answer-body"><%= answer.answer %></p></pre>
+
+            <!-- Answer Info -->
+            <div class="answer-info">
+
+                <!-- Upvote and Unvote buttons -->
+                <% if(answer.votes.indexOf(user._id) === -1){ %>
+                    <button class="upvote-answer upans<%= answer._id %> " value="<%= answer._id %>"><i class="fas fa-arrow-up"></i></button>
+                    <button class="unvote-answer upans<%= answer._id %> hidden" value="<%= answer._id %>"><i class="fas fa-arrow-down"></i></button>
+                <% } else {%>
+                    <button class="upvote-answer upans<%= answer._id %> hidden" value="<%= answer._id %>"><i class="fas fa-arrow-up"></i></button>
+                    <button class="unvote-answer upans<%= answer._id %> " value="<%= answer._id %>"><i class="fas fa-arrow-down"></i></button>
+                <% } %>  
+                
+
+                <!-- Points -->
+                <span class="answer" id="<%= answer._id %>">
+                    <%= answer.votes.length %> points
+                </span> 
+
+                <!-- OP -->
+                | by <%= answer.username %> | <p class="toggle-comments" value = "<%= answer._id %>">Comments(<%= answer.comments.length %>)</p> | <span class="ans_time<%=answer._id%>"></span> 
+
+                <!-- Verification Status -->
+                <span class=" verify verify<%= answer._id %>">
+                    <%  if( answer.TA_verified )  {%>
+                        Verified Answer |
+                    <% } %>
+                </span>
+
+
+                <!-- TA Verification -->
+                <%  if( user.role == "teacher" || user.role == "TA")  {%>
+                    <%  if( answer.TA_verified )  {%>
+                        <button class="btn btn-discussion btn-round btn-outline-primary my-2 my-sm-0 TA_verify_a" value="<%= answer._id %>"><span class="abverify<%= answer._id %>">Unverify</span></button>
+                    <% } else { %>
+                        <button class="btn btn-discussion btn-round btn-outline-primary my-2 my-sm-0 TA_verify_a" value="<%= answer._id %>"><span class="abverify<%= answer._id %>">Verify</span></button>
+                    <% } %>
+                <% } %>
+            </div>
+
+            <!--Comments section for each answer-->
+            <% for(let c of answer.comments) { %>
+                <% commentMap[c._id] = c %>
+                <div class="comments comments<%= answer._id %> hidden">
+                    <pre style='white-space:pre-wrap'><p class="comment-body"><%= c.comment %></p></pre>
+
+                    <div class="comment-info">
+                        <!-- Upvote button -->
+                        <% if(answer.votes.indexOf(user._id) === -1){ %>
+                            <button class="upvote-comment upcom<%= c._id %>" value="<%= c._id %>"><i class="fas fa-arrow-up"></i></button>
+                            <button class="unvote-comment upcom<%= c._id %>  hidden" value="<%= c._id %>"><i class="fas fa-arrow-down"></i></button>
+                        <% } else {%>
+                            <button class="upvote-comment upcom<%= c._id %>  hidden" value="<%= c._id %>"><i class="fas fa-arrow-up"></i></button>
+                            <button class="unvote-comment upcom<%= c._id %> " value="<%= c._id %>"><i class="fas fa-arrow-down"></i></button>
+                        <% } %>  
+
+                        <!-- Points -->
+                        <span class="comment" id="<%= c._id %>">
+                            <%= c.votes.length %> points
+                        </span> 
+
+                        <!-- Commenter username -->
+                        | by <%= c.username %> |
+
+                        <!-- Verification Status -->
+                        <span class=" verify cverify<%= c._id %>">
+                            <%  if( c.TA_verified )  {%>
+                                Verified Answer |
+                            <% } %>
+                        </span>
+
+                        <!-- TA Verification -->
+                        <%  if( user.role == "teacher" || user.role == "TA")  {%>
+                            <%  if( c.TA_verified )  {%>
+                                <button class="btn btn-discussion btn-round btn-outline-primary my-2 my-sm-0 TA_verify_c" value="<%= c._id %>"><span class="cbverify<%= c._id %>">Unverify</span></button>
+                            <% } else { %>
+                                <button class="btn btn-discussion btn-round btn-outline-primary my-2 my-sm-0 TA_verify_c" value="<%= c._id %>"><span class="cbverify<%= c._id %>">Verify</span></button>  
+                            <% } %>
+                        <% } %>
+
+                        <!-- Annotation -->
+                        <%  if( user.role == "TA" )  {%>
+                            <!-- Annotated Status -->
+                            <%  if( c.annotate != "None" )  { %>
+                                Annotated | <%=c.annotate %> |
+                                <div class="annotation">
+                                    <form action="/discussions/annotate/<%=discussion._id%>/<%= c._id %>" method="POST" class="annotation-form">
+                                        <div class="form-group">
+                                            <input type="hidden" name="annotate" value="None"/>
+                                            <button class="btn btn-annotate btn-round btn-outline-primary my-2 my-sm-0"><span>Unannotate</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            <% } else  { %>
+                                <div class="annotation">
+                                    <form action="/discussions/annotate/<%=discussion._id%>/<%= c._id %>" method="POST" class="annotation-form">
+                                        <div class="form-group">
+                                            <label for="annotate" class="annotation-label">Select Annotation -</label>
+                                            <select name="annotate" class="form-control" id="annotate" type="annotate">
+                                              <option value="Agreement">Agreement</option>
+                                              <option value="Disagreement">Disagreement</option>
+                                              <option value="Partial">Partial</option>
+                                            </select>
+                                            <button class="btn btn-annotation btn-round btn-outline-primary my-2 my-sm-0"><span>annotate</span></button>
+                                        </div>
+                                    </form>
+                                </div>
+                            <% } %>
+                        <% } %>
+
+
+                        
+
+                    </div>
+                </div>
+            <% } %>
+
+            
+            <%  if( !answer.thread_close )  {%>
+            <!-- TA Intervention -->
+                <%  if( answer.TA_intervene )  {%>
+                    <%  if( user.role == "teacher" || user.role == "TA" )  {%>
+
+                        <!-- Add Comment to an Answer -->
+                        <p class="comments-disabled">Intervention Needed</p>
+                        <div class="comment-field comment-field<%= answer._id  %> hidden">
+                            <form action="/discussions/<%=discussion._id%>/<%=answer._id%>/comment" method="POST">
+                                <div class="form-group">
+                                    <label for="Comment Question">Comment</label>
+                                    <input type="text" class="form-control" name="comment" required>
+                                </div>
+                                <button class="btn btn-discussion btn-round btn-outline-primary my-2 my-sm-0">Comment</button>
+                            </form>
+                        </div>
+
+                        <!-- Comments Disabled -->
+                    <% } else  {%>
+                        <p class="comments-disabled">Comments disabled till TA intervention</p>
+                    <% } %>
+                <% } else  {%>
+                    <!-- Add Comment to an Answer -->
+                    <div class="comment-field comment-field<%= answer._id  %> hidden">
+                        <form action="/discussions/<%=discussion._id%>/<%=answer._id%>/comment" method="POST">
+                            <div class="form-group">
+                                <label for="Comment Question">Comment</label>
+                                <textarea class="form-control" name="comment" style='white-space:pre-wrap' required></textarea>
+                            </div>
+                            <button class="btn btn-discussion btn-round btn-outline-primary my-2 my-sm-0">Comment</button>
+                        </form>
+                    </div>
+
+                <% } %>
+                <% if(answer.inactive && ( user.role == "teacher" || user.role == "TA" )){ %>
+                    <div class="Branch_result">
+                        <form action="/discussions/branch/<%=discussion._id%>/<%= answer._id %>" method="POST" >
+                            <div class="form-group">
+                                <input type="hidden" name="branch" value="None"/>
+                                <button class="btn btn-discussion btn-round btn-outline-primary my-2 my-sm-0">Close thread</button>
+                            </div>
+                        </form>
+                    </div>
+                <% } %>
+            <% } else  {%>
+                <p class="comments-disabled">Thread closed</p>
+            <% } %>
+            <hr>
+        <% } %>
+
+    </div>
+
+
+</div>
+</div>
+
+<!-- UI Script -->
+<script>
+    const answerButton = document.querySelector(".btn-answer");
+    const answerField = document.querySelector(".answer-field");
+    answerButton.addEventListener("click", function(){
+            answerButton.classList.toggle("hidden");
+            answerField.classList.toggle("hidden");
+        })
+    $(".toggle-comments").click(function () {
+      var value = $(this).attr('value');
+      $( ".comments"+value ).toggle({
+        duration: 500,
+      });
+      $( ".comment-field"+value ).toggle({
+        duration: 500,
+      });
+  });  
+
+</script>
+
+
+<!-- Ajax calls -->
+<script>
+    var user =  <%- JSON.stringify(user) %>;
+    var discussion =  <%- JSON.stringify(discussion) %>;
+    var answerMap = <%- JSON.stringify(answerMap) %>;
+    var commentMap = <%- JSON.stringify(commentMap) %>;
+    console.log(commentMap);
+    var max_time = discussion.timestamp;
+    var date = new Date(discussion.timestamp);
+    $('.ques_time').text("on " + date.getDate()+
+          "/"+(date.getMonth()+1)+
+          "/"+date.getFullYear()+
+          " "+date.getHours()+
+          ":"+date.getMinutes()+
+          ":"+date.getSeconds());
+
+    for (var m in answerMap){
+        var date = new Date(answerMap[m].timestamp);
+        if(answerMap[m].timestamp > max_time) max_time = answerMap[m].timestamp;
+        $('.ans_time'+m).text("on " + date.getDate()+
+          "/"+(date.getMonth()+1)+
+          "/"+date.getFullYear()+
+          " "+date.getHours()+
+          ":"+date.getMinutes()+
+          ":"+date.getSeconds());
+    }
+    for (var c in commentMap){
+        if(commentMap[c].timestamp > max_time) max_time = commentMap[c].timestamp;
+    }
+    var date = new Date(max_time);
+    $('.last_time').text("on " + date.getDate()+
+          "/"+(date.getMonth()+1)+
+          "/"+date.getFullYear()+
+          " "+date.getHours()+
+          ":"+date.getMinutes()+
+          ":"+date.getSeconds());
+
+
+    
+
+    // Upvoting and Unvoting a Question
+    $(".upvote-question").click(function(){
+        id = $(this).val();
+        if (discussion.votes.indexOf(user._id) === -1){
+            $.ajax({
+                type: "POST",
+                url: "/discussions/question/"+id,
+                data: {value: 1},
+                success: function (data) {
+                    discussion = data.discussion;
+                    $('.question#'+id).text(discussion.votes.length + " points");
+                    $('.upques'+id).toggleClass("hidden");
+                }
+            });
+        }
+        else{
+            $.ajax({
+            type: "POST",
+            url: "/discussions/question/"+id,
+            data: {value: -1},
+            success: function (data) {
+                discussion = data.discussion;
+                $('.question#'+id).text(discussion.votes.length + " points");
+                $('.upques'+id).toggleClass("hidden");
+            }
+        });
+        }
+    });
+    
+    // Upvoting and Unvoting an Answer
+    $(".upvote-answer").click(function(){
+        id = $(this).val();
+        if (answerMap[id].votes.indexOf(user._id) === -1){
+            $.ajax({
+                type: "POST",
+                url: "/discussions/answer/"+id,
+                data: {value: 1, did: discussion._id},
+                success: function (data) {
+                    discussion = data.discussion;
+                    answerMap[id] = data.answer;
+                    $('.answer#'+id).text(data.answer.votes.length + " points");
+                    $('.upans'+id).toggleClass("hidden");
+                }
+            });
+        }
+    });
+
+    $(".unvote-answer").click(function(){
+        id = $(this).val();
+        if (answerMap[id].votes.indexOf(user._id) != -1){
+            $.ajax({
+                type: "POST",
+                url: "/discussions/answer/"+id,
+                data: {value: -1, did: discussion._id },
+                success: function (data) {
+                    discussion = data.discussion;
+                    answerMap[id] = data.answer;
+                    $('.answer#'+id).text(data.answer.votes.length + " points");
+                    $('.upans'+id).toggleClass("hidden");
+                }
+            });
+        }
+    });
+    
+    // TA Verification for an Answer
+    $(".TA_verify_a").click(function(){
+        id = $(this).val();
+        if (answerMap[id].TA_verified){
+            $.ajax({
+                type: "POST",
+                url: "/discussions/a/verify/"+id,
+                data: {value: 0, did: discussion._id},
+                success: function (data) {
+                    discussion = data.discussion;
+                    answerMap[id] = data.answer;
+                    $('.verify'+id).text("");
+                    $('.abverify'+id).text("Verify");
+                }
+            });
+        }
+        else{
+            $.ajax({
+                type: "POST",
+                url: "/discussions/a/verify/"+id,
+                data: {value: 1, did: discussion._id },
+                success: function (data) {
+                    discussion = data.discussion;
+                    answerMap[id] = data.answer;
+                    $('.verify'+id).text("Verified Answer |");
+                    $('.abverify'+id).text("Unverify");
+                }
+            });
+        }
+    });
+
+    // Upvoting and Unvoting a Comment
+    $(".upvote-comment").click(function(){
+        // console.log('comment');
+        id = $(this).val();
+        if (commentMap[id].votes.indexOf(user._id) === -1){
+            $.ajax({
+                type: "POST",
+                url: "/discussions/comment/"+id,
+                data: {value: 1, did: discussion._id},
+                success: function (data) {
+                    discussion = data.discussion;
+                    commentMap[id] = data.comment;
+                    $('.comment#'+id).text(data.comment.votes.length + " points");
+                    $('.upcom'+id).toggleClass("hidden");
+                }
+            });
+        }
+    });
+
+    $(".unvote-comment").click(function(){
+        id = $(this).val();
+        if (commentMap[id].votes.indexOf(user._id) != -1){
+            $.ajax({
+                type: "POST",
+                url: "/discussions/comment/"+id,
+                data: {value: -1, did: discussion._id },
+                success: function (data) {
+                    discussion = data.discussion;
+                    commentMap[id] = data.comment;
+                    $('.comment#'+id).text(data.comment.votes.length + " points");
+                    $('.upcom'+id).toggleClass("hidden");
+                }
+            });
+        }
+    });
+    
+
+    $(".TA_verify_c").click(function(){
+        // console.log('verify');
+        id = $(this).val();
+        if (commentMap[id].TA_verified){
+            $.ajax({
+                type: "POST",
+                url: "/discussions/c/verify/"+id,
+                data: {value: 0, did: discussion._id},
+                success: function (data) {
+                    discussion = data.discussion;
+                    commentMap[id] = data.comment;
+                    $('.cverify'+id).text("");
+                    $('.cbverify'+id).text("Verify");
+                }
+            });
+        }
+        else{
+            $.ajax({
+                type: "POST",
+                url: "/discussions/c/verify/"+id,
+                data: {value: 1, did: discussion._id },
+                success: function (data) {
+                    discussion = data.discussion;
+                    commentMap[id] = data.comment;
+                    $('.cverify'+id).text("Verified Answer |");
+                    $('.cbverify'+id).text("Unverify");
+                }
+            });
+        }
+    });
+
+    // Intervention Notification
+    function add_notification(msg)
+    {
+      $.ajax
+        ({
+          type: 'POST',  // http method
+          url: '/resources/addTAnotification',
+          data: {message:msg},
+          success:         
+          function (data, status, xhr)
+          {
+            console.log("Added");
+          },       
+
+          error: function (jqXhr, textStatus, errorMessage)
+          {
+            console.log("Can't add ");
+          }            
+        });
+    }
+    function showUploaded()
+    {
+      $('.alert').addClass("show");
+      $('.alert').removeClass("hide");
+      $('.alert').addClass("showAlert");
+    
+      setTimeout(function()
+      {
+        $('.alert').removeClass("show");
+        $('.alert').addClass("hide");
+      },5000);
+
+      $('.close-btn').click(function()
+      {
+        $('.alert').removeClass("show");
+        $('.alert').addClass("hide");
+      });
+    }
+
+    $(document).ready(function () {
+      $("#wrapper").toggleClass("toggled");
+      
+    });
+
+    $(".notifications .icon_wrap").click(function()
+    {
+      $(this).parent().toggleClass("active");
+      $.ajax
+      ({
+            url: "/resources/notification",
+            type: "get", //send it through get method
+            contentType: "application/json",
+
+            success: function(response)
+            {              
+              var lis = document.getElementById("Notification_ALL");
+              lis_length = lis.children.length;
+              for (let i = 0; i < lis_length; i++)
+              {
+                lis.removeChild(lis.children[0]);
+              }
+              console.log(lis.children.length);
+
+              response.noti.forEach(element => 
+              { 
+                var li = document.createElement("li");
+                var inputValue = element.message;
+                console.log(inputValue);
+                  if(inputValue.substring(0,2) == "TA"){
+                    console.log(inputValue);
+                    var a = document.createElement('a');
+                    var linkText = document.createTextNode(inputValue);
+                    a.appendChild(linkText);
+                    a.title = "Intervention OR Thread closing";
+                    var href = inputValue.substring(23, inputValue.length);
+                    a.href = "/discussions/" + String(href);
+                    li.appendChild(a);
+                    lis.appendChild(li);
+                  }
+                  else{
+                var t = document.createTextNode(inputValue);
+                li.appendChild(t);
+                lis.appendChild(li);
+                  }
+              });
+            },
+            error: function(xhr){
+              console.log("Add Error!");
+            }
+      });
+    });
+    console.log(user);
+    
+    for(answerID in answerMap){
+        if(answerMap[answerID].TA_intervene){
+                var msg = "TA intervention needed ";
+                msg += String(discussion._id);
+                console.log("Intervention needed");
+                add_notification(msg);
+        }
+    }
+    // for(answerID in answerMap){
+    //     if(answerMap[answerID].inactive){
+    //             var msg = "TA intervention needed ";
+    //             msg += String(discussion._id);
+    //             console.log(discussion._id);
+    //             add_notification(msg);
+    //     }
+    // }
+</script>

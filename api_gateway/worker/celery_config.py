@@ -1,0 +1,7 @@
+BROKER_URL = "redis://@localhost:6379/0"
+#BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "amqp://guest@localhost:5672//"
+CELERY_ACKS_LATE = True
+CELERY_RESULT_PERSISTENT=True
+CELERYD_MAX_TASKS_PER_CHILD=1
+

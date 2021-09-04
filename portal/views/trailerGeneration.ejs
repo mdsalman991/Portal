@@ -1,0 +1,77 @@
+<div class="d-flex toggled" id="wrapper">
+    <%- include('./partials/sidebar.ejs') %>
+    <div id="page-content-wrapper">
+        <div id='tgPage-content'>
+            <center>
+                <h2 class="mt-4" font-family: "Langar";>  Trailer Generation Dashboard  </h2>
+            </center>
+            <select name="maps" id="map-select" style="width:500px;margin-left: 25%;margin-top:5%;">
+              <% var mapOptions='' %>  
+              <% for (var i = 0; i < learningMapsList.length; i++){ %> 
+                <%if( (localStorage.getItem("clickSource")=="viewMapPage") && localStorage.getItem("mapId")==JSON.stringify(learningMapsList[i]._id)){%>
+                  <%mapOptions+=('<option value="'+learningMapsList[i]._id+'" selected>'+learningMapsList[i].mapName+'</option>');%>      
+                <%}else{%>
+                <% mapOptions+=('<option value="'+learningMapsList[i]._id+'">'+learningMapsList[i].mapName+'</option>'); %> 
+                <% } %>  
+                <% } %>
+              <option value="">--Please choose a map--</option>
+              <%- mapOptions %>
+            </select>
+
+            <button type="button" id="fetch-paths" class="btn btn-round btn-outline-primary my-2 my-sm-0" style="margin-left: 25px; padding:10px;">Fetch Paths</button>
+         
+            <div id="map-error" style="margin-left: 57%"></div>
+
+            <select name="paths" id="path-select" style="width:500px;margin-left: 25%;margin-top:30px;">
+                  <option value="">--Please choose a path--</option>
+            </select>
+            <button type="button" id="fetch-resources" class="btn btn-round btn-outline-primary my-2 my-sm-0" style="margin-left: 25px;padding:10px;margin-top:5px;">Fetch Resources</button>
+            <div id="path-error" style="margin-left: 58%"></div>
+            <br><br>
+            <div id='resources' style="margin-left: 15%;"></div>
+            <div class="row" style="margin-top: 50px;margin-left: 25%;">
+                <div class="column">
+                  <input type="radio" id="radio-t1" name="template-selection"/> 
+                  <label for="radio-t1"><a href="#" class="vpop"><img class="templates" src="/trailer_generation/template_2/data/default/template_vids/template_1.png" alt="template-1"></a></label>
+                </div>
+                <div class="column">
+                  <input type="radio" id="radio-t2" name="template-selection"/>
+                  <label for="radio-t2"><a href="#" class="vpop"><img class="templates" src="/trailer_generation/template_2/data/default/template_vids/template_2.png" alt="template-2"></a></label>
+                </div>
+            </div>
+            <div style="margin-top:30px;margin-left:25%;">
+              <input type="checkbox" id="voiceover_checkbox"/><label for="voiceover_checkbox" style="margin-left:3px;">Voiceover</label>
+              <div id="voiceover-options" style="margin:0px 10px;"></div><br>
+              <input type="checkbox" id="subtitles_checkbox"/><label for="subtitles_checkbox" style="margin-left:3px;">Subtitles</label>
+              <div id="subtitles-options" style="margin:0px 10px;"></div><br>
+              <input type="checkbox" id="wordcloud_checkbox"/><label for="wordcload_checkbox" style="margin-left:3px;">Wordcloud</label>
+              <div id="wordcloud-options" style="margin:0px 10px;"></div>
+            </div>
+            <center>  
+                  <button type="button" id="generate-trailer1" class="btn btn-round btn-outline-primary my-2 my-sm-0"  >Generate trailer</button>
+            </center>
+            
+        </div>
+        <div id="edit-frame">
+        </div>
+        <div class="modal fade" id="enlarged-view" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg" >
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" onclick="onClose()">&times;</button>
+                  </div>
+                  <div class="modal-body" id="preview">
+                    <iframe class="videopreview"  src="" style="width:100%; height:500px;"></iframe>
+                  </div>
+                </div>
+            </div>    
+        </div>
+    </div>
+</div>
+<script>
+  function onClose()
+       { 
+    $("#enlarged-view iframe").attr("src", "");
+       };
+  
+</script>

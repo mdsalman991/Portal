@@ -1,0 +1,552 @@
+
+<div class="d-flex toggled" id="wrapper">
+
+  <%- include('./partials/sidebar.ejs') %>
+  <%- include('./partials/notify.ejs') %>
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+
+      <nav class="navbar navbar-expand-lg navbar-light" id="navb">
+        <ul class="navbar-nav mr-auto">
+        <button class="btn btn-secondary" id="menu-toggle"><i class="fas fa-bars fa-2x" aria-hidden="true"></i></button>
+        </ul>
+        <form class="form-inline my-2 my-lg-0 search-form">
+          <div class="form-group" style="margin-right: 5px;">
+            <select class="custom-select" id="resourceTypeDropdown">
+              <option selected="">All</option>
+              <option value="Pdf">Pdf</option>
+              <option value="Text">Text</option>
+              <option value="Video">Video</option>
+            </select>
+          </div>
+		  
+          <input class="form-control mr-lg-2" type="text" id="search-input" placeholder="Search">
+		  
+		  
+          <button class="btn btn-round btn-outline-primary my-2 my-sm-0" type="submit"><i class="fas fa-search" aria-hidden="true"></i>&nbsp;Search</button>
+        </form>
+		
+		
+      </nav>
+
+      <div class="row">
+          <div class="col-2"></div>
+          <div class="col-8" id='resourcePageContent'>
+            <center><h2 class="mt-4" style="font-family: 'Langar';">  All Resources  </h2></center>  
+            <div class="btn-group">
+              <button type="button" class="btn btn-round btn-outline-primary my-2 my-sm-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">upload new resource</button>
+              <div class="dropdown-menu">
+                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#myModal11">File Upload</button>
+                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#myModal21">URL Upload</button>
+              </div>
+            </div>
+            <div class="modal fade" id="myModal11" role="dialog">
+              <div class="modal-dialog" >
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h4 class="modal-title">Step 1 of 2</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  </div>
+                  <div class="modal-body">
+                    <form id="form">
+                      <fieldset>
+                        <center><legend>1.Select Resource Type</legend></center>       
+                        <fieldset class="form-group" style="margin-left: 27%;">  
+                          <div class="form-check-inline">
+                            <label class="form-check-label">
+                              <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios1" value="text" checked="">
+                              Text
+                            </label>
+                          </div>
+                          <div class="form-check-inline disabled">
+                          <label class="form-check-label">
+                              <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios2" value="pdf" >
+                              Pdf
+                            </label>
+                          </div>
+                          <div class="form-check-inline disabled">
+                          <label class="form-check-label">
+                              <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios3" value="video" >
+                              Video
+                            </label>
+                          </div>
+                        </fieldset>
+                        <center><legend>2.Select the files</legend></center>
+                        <div class="form-group" style="margin-top: auto; margin-left: 23%;">
+                          <input type="file"  accept=".pdf,.txt,.mp4" class="form-control-file" id="file-name" aria-describedby="fileHelp" multiple="multiple">
+                        </div>
+                        <button type="button" id="form-submit" class="btn btn-round btn-outline-primary my-2 my-sm-0" style="margin-left: 40%" data-dismiss="modal" data-toggle="modal" data-target="#myModal12">Next</button>
+                    </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal fade" id="myModal21" role="dialog">
+              <div class="modal-dialog" >
+                <div class="modal-content">
+                  <div class="modal-header">
+                   <h4 class="modal-title">Step 1 of 2</h4>
+                   <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  </div>
+                  <div class="modal-body">
+                    <form id="form">
+                      <center><legend>1.Enter the number of url uploads</legend></center>
+                      <div class="form-group" style="margin-left:20%;">
+                        <input type="text" id="url-number" placeholder="Enter the number" value="1" style="width: 135px">
+                        <button type="button" id="url-number-submit" class="btn btn-round btn-outline-primary my-2 my-sm-0"  >Get URL space</button>
+                      </div>
+                      <center><legend>2.Enter the url</legend></center>
+                      <div class="form-group" id="urlSpace" style="margin-left: auto; width: auto; ">
+                        <input type="text"   class="form-control-url" id="url-name1" placeholder="Enter Youtube url" value="">
+                      </div>
+                      <button type="button" id="url-submit" class="btn btn-round btn-outline-primary my-2 my-sm-0" style="margin-left: 40%" >Next</button>
+                      <div id="error" style="margin-left: 35%"></div>
+                    </form>      
+                  </div>
+                  <div class="modal-footer">
+                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div  id="resourceGroupCard">
+          <%var userId = user._id%>
+          <%var user =  JSON.stringify(user) %>
+          <% resourceList.forEach(function(resource) { %>
+            <% let rsrString = JSON.stringify(resource); %>
+            <% var tagString = ""; %>
+            <% for (var i = 0; i < resource.resourceTags.length; i++){ %>
+            <%  if (i > 0){ tagString += ", "; } %>
+            <% tagString += resource.resourceTags[i].tagName %>
+            <% } %>
+            <%var likesList = resource.likedBy;%>
+            <%var dislikesList = resource.dislikedBy;%>
+            <%var noOfLikes = likesList.length;%>
+            <%var noOfDislikes = dislikesList.length;%>
+            <%var completedList = resource.completedBy;%>
+
+            <% if (resource.resourceType === 'Text'){ %>
+            <%  rsrTypeIcon='<small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-file-alt" aria-hidden="true"></i>Text</small>'; %>
+            <% } %>
+
+            <% if (resource.resourceType === 'Pdf'){ %>
+            <%  rsrTypeIcon='<small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-file-pdf" aria-hidden="true"></i>&nbsp;Pdf</small>'; %>
+            <% } %>
+
+            <% if (resource.resourceType === 'Video'){ %>
+            <%  rsrTypeIcon='<small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-video" aria-hidden="true"></i>Video</small>'; %>
+            <% } %>
+            
+            <%var thumbsUpIcon = '<button style="border: none; background: none;" onclick=\'clickLike('+ rsrString +','+ noOfLikes + ','+ 0 +' ) \'><i id="' + resource._id +'" class="far fa-thumbs-up" aria-hidden="true">&nbsp;'+ noOfLikes +'</i></button>';%>
+            <%for (var k = 0; k < likesList.length; k++){%>
+                
+                <%if (JSON.stringify(likesList[k]) === JSON.stringify(userId)){%>
+                  <%thumbsUpIcon = '<button style="border: none; background: none;" onclick=\'clickLike('+ rsrString +','+ noOfLikes + ','+ 1 + ' ) \'><i id="' + resource._id +'" class="fas fa-thumbs-up" aria-hidden="true">&nbsp;'+ noOfLikes +'</i></button>';%>
+                  <%break;%>
+                  <%}%>
+                <%}%>
+
+              <%var thumbsDownIcon = '<button style="border: none; background: none;" onclick=\'clickDislike('+ rsrString +','+ noOfDislikes + ','+ 0 + ' ) \'><i id="dislike' + resource._id +'" class="far fa-thumbs-down" aria-hidden="true">&nbsp;'+ noOfDislikes +'</i></button>';%>
+
+              <%for (var k = 0; k < dislikesList.length; k++){%>
+                <%if (JSON.stringify(dislikesList[k]) === JSON.stringify(userId)){%>
+                  <%thumbsDownIcon = '<button style="border: none; background: none;" onclick=\'clickDislike('+ rsrString +','+ noOfDislikes + ','+ 1 + ' ) \'><i id="dislike' + resource._id +'" class="fas fa-thumbs-down" aria-hidden="true">&nbsp;'+ noOfDislikes +'</i></button>';%>
+                  <%break;%>
+                  <%}%>
+                <%}%>
+
+              <%var completedIcon = '<button id="btnCompleted' + resource._id +'" style="border: none; background: none;" onclick=\'clickCompleted('+ rsrString +' ) \'><i id="completed' + resource._id +'" class="far fa-check-circle" aria-hidden="true">&nbsp;completed?</i></button>';%>
+
+              <%for (var k = 0; k < completedList.length; k++){%>
+                <%if (JSON.stringify(completedList[k]) === JSON.stringify(userId)){%>
+                  <%completedIcon = '<button id="btnCompleted' + resource._id +'" style="border: none; background: none;" onclick=\'clickCompleted('+ rsrString +' ) \' disabled><i id="completed' + resource._id +'" class="fas fa-check-circle" aria-hidden="true">&nbsp;completed</i></button>';%>
+                  <%}%>
+                  <%}%>
+                  <% var deleteIcon='<button class="btn btn-round btn-outline-primary my-2 my-sm-0" id="delete'+resource._id+'" onclick= \'clickDelete('+ rsrString +' ) \'>Delete</button>' %>
+            
+                  <%if (JSON.stringify(resource.uploadedBy) != JSON.stringify(userId)){%>
+                      <%deleteIcon='';%>
+                      <% } %>
+      
+                  <% var editIcon='<button data-toggle="modal" data-target="#myModal3" class="btn btn-round btn-outline-primary my-2 my-sm-0" id="edit'+resource._id+'" onclick= \'clickEdit('+ rsrString +' ) \'>Edit</button>' %>
+                  
+                  <%if (JSON.stringify(resource.uploadedBy) != JSON.stringify(userId)){%>
+                    <%editIcon='';%>
+                    <% } %>
+            <div class="card border-dark mb-6" style="max-width: 80rem; max-height: 80rem; margin-top:20px; margin-bottom: 20px;">
+              <div class="card-body">
+                <h4 class="card-title" style="margin-bottom:0.01rem;"><%= resource.resourceName %></h4>
+                <small class="text-muted" style="margin-bottom: 5rem;"><i class="fas fa-user"></i>&nbsp;<%= resource.createdByUsername %></small>
+                <small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-clock"></i>&nbsp;<%= resource.attentionTime %>&nbsp;mins</small>
+                <small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-tags" aria-hidden="true"></i>&nbsp;<%= tagString %></small>
+                <%- rsrTypeIcon %>
+                <%- thumbsUpIcon%>
+                <%- thumbsDownIcon%>
+                <%-completedIcon%>
+                <p class="card-text"><%= resource.resourceDescription %></p>
+                <br/><br/>
+                
+                <button id="<%= resource._id %>" class="btn btn-round btn-outline-primary my-2 my-sm-0 renderFile" type="submit" >View</button>
+
+                <%- deleteIcon %>
+                <%- editIcon %>
+
+                <a class="btn btn-round btn-outline-primary my-2 my-sm-0" href="/discussions/r/<%= resource._id %>">Discussions</a>
+
+              </div>
+            </div>
+          <% }); %>
+
+        </div>
+
+        <div class="col-2"></div>
+          </div>
+      <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+      <script>        
+//when next is clicked in the 1st modal of file upload
+         $("#form-submit").click((e) => {
+      
+      const files = document.getElementById("file-name").files;
+
+      var htmlTable= '<div class="modal fade" id="myModal12" role="dialog"><div class="modal-dialog mw-100 w-50" ><div class="modal-content"><div class="modal-header"><h4 class="modal-title">Step 2 of 2</h4><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body">'
+
+      htmlTable+= '<h2>Customize Resource Information</h2><table class="table table-hover customize-table"><thead><tr><th scope="col">Resource Name</th><th scope="col">Resource Description</th><th scope="col">Resource Tag</th></tr></thead><tbody>';
+      
+      let f = 1;
+      
+      Array.from(files).forEach(file => {
+        var row;
+        if (f == 1) {
+          row = '<tr class="table-primary"><th scope="row"><input type="text" id="' + file.name + '" class="form-control" value=' + file.name + '></input></th><td><input type="text" id="desc' + file.name + '" class="form-control" value=""></input></td><td><input type="text" id="tag' + file.name + '" class="form-control" value=""></input></td></tr>';
+          f = 0;
+        } else {
+        row = '<tr class="table-secondary"><th scope="row"><input type="text" id="' + file.name + '" class="form-control" value=' + file.name + '></input></th><td><input type="text" id="desc' + file.name + '" class="form-control" value=""></input></td><td><input type="text" id="tag' + file.name + '" class="form-control" value=""></input></td></tr>';
+         f = 1;
+      }
+
+      htmlTable += row;
+
+    });
+
+      htmlTable += '</tbody></table>';
+
+      htmlTable += '<button type="button" id="customize-submit" class="btn btn-primary" style="margin-left:40%"> Submit</button>';
+
+      htmlTable += '</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div>'
+      
+      const customizeForm = document.getElementById('customize-form');
+      
+      customizeForm.innerHTML = htmlTable;
+      });
+     
+         $(document).on('click', '#customize-submit', function () {
+     
+           const customizeTable = document.getElementsByTagName("table")[0];
+           const rowLength = customizeTable.rows.length;
+           let files = document.getElementById("file-name").files;
+           //console.log(files);
+           const resourceType = "Text";
+     
+           const fileList = [];
+           const updatedFileNames = [];
+           const updatedResourceDescriptions = [];
+           const updatedResourceTags=[];
+     
+           Array.from(files).forEach(file => {
+             fileList.push(file.name);
+           });
+     
+           for (i = 1; i < rowLength; i++) {        
+            let f_name_input = document.getElementById(fileList[i - 1]);
+            updatedFileNames.push(f_name_input.value);
+            
+            let rsrDescId = "desc" + fileList[i - 1];
+            
+            let f_rsr_description = document.getElementById(rsrDescId);
+            updatedResourceDescriptions.push(f_rsr_description.value);
+            
+            let rsrTagId = "tag" + fileList[i - 1];
+            
+            let f_rsr_tag = document.getElementById(rsrTagId);
+            updatedResourceTags.push(f_rsr_tag.value);          
+        }
+     
+          files = document.getElementById("file-name").files;
+          $('#myModal12').modal('hide');
+          
+          var x = document.getElementById("NAVHEADER");
+          x.style.top = "-50px";
+          $("#wrapper").toggleClass("toggled");      
+          x = document.getElementById("menu-toggle");
+          x.style.display = "none";
+          
+          $('#navb').css("display", "none");
+          let uploadHtml = '<div id="over" style="margin-left: 300px;"> <img src="../images/upload.gif" alt="Upload logo"> </div>';
+          $('#resourcePageContent').replaceWith(uploadHtml); 
+           
+           var formdata = new FormData();
+           for (var i = 0; i < files.length; i++) {
+             formdata.append('multipleFiles', files[i]);
+             console.log(files[i]);
+           }
+    
+           formdata.append('uploadType', '0');//file upload so a flag '0' is sent
+           formdata.append('updatedFileNames', updatedFileNames);
+           formdata.append('updatedResourceDescriptions', updatedResourceDescriptions);
+           formdata.append('updatedResourceTags', updatedResourceTags);
+          
+           var i = 0;
+      function move()
+      {
+        if (i == 0)
+        {
+          i = 1;
+          let width = 10;
+          var id = setInterval(frame, 1);
+          function frame()
+          {
+            if (width >= 100)
+            {
+              display();
+              clearInterval(id);
+              i = 0;
+            } 
+            else 
+            {
+              width+=100;
+            }
+          }
+        }
+      }
+      move();
+
+      function display()
+      {
+        $.ajax
+        ({
+          type: 'POST',  // http method
+          url: '/resources/viewResource',
+          data: formdata,
+          processData: false,
+          contentType: false,
+          dataType: 'json',
+
+          success:         
+          function (data, status, xhr)
+          {
+            
+              let str = 'File ';
+              str += updatedFileNames;
+              str += ' Uploaded Sucessfully';
+
+              add_notification(str);
+  
+            var x = document.getElementById("NAVHEADER");
+            x.style.top = "0";
+            $("#wrapper").toggleClass("toggled");      
+            x = document.getElementById("menu-toggle");
+            x.style.display = "block";
+            
+            $('#navb').css("display", "flex");
+            let successHtml = '<div class=""><div class="row d-flex justify-content-center text-center"><div class="confirm"><p>Your Resource Has Been Successfuly Submitted And you will Be Notified once Uploded !</p></div></div> <div class="row d-flex justify-content-center"><div> <img src="../images/success.gif" alt="GeeksforGeeks logo"> </div> </div><a style="margin-left:35%;" href="/resources/viewResource">Upload more resources</a></div>';
+            $('#over').replaceWith(successHtml);
+            console.log(str);
+            showUploaded(str);
+          },       
+            
+        });
+      }
+         });
+//for the get space of urls i.e to select the no. of urls user is going to upload         
+         $("#url-number-submit").click((e) => {
+              const numberOfUrls = document.getElementById("url-number").value;
+              var urlTable='<div class="form-group" id="urlSpace" style="margin-left: auto; width: auto; ">';
+              for (let i = 0; i < numberOfUrls; i++) {
+                let x=i+1;
+                urlTable+='<input type="text"   class="form-control-url" id="url-name'+x+'" placeholder="Enter Youtube url" value="">';
+              }
+              urlTable+='</div>';
+              const urlInputSpace=document.getElementById('urlSpace');
+              urlInputSpace.outerHTML=urlTable;
+            });
+//next button of 1st modal of url upload
+         $("#url-submit").click((e) => {
+      const numberOfUrls = document.getElementById("url-number").value;
+      const urls = document.getElementsByClassName("form-control-url");
+      var urlValues=[];
+      for (let i = 0; i < numberOfUrls; i++) {
+        urlValues.push(urls[i].value);
+      }
+      var formdata = new FormData();
+      formdata.append('uploadType', '2');//to check whether given urls are valid or not
+      formdata.append('urlValues', urlValues);
+      
+      var htmlTable= '<div class="modal fade" id="myModal22" role="dialog"><div class="modal-dialog mw-100 w-50" ><div class="modal-content"><div class="modal-header"><h4 class="modal-title">Step 2 of 2</h4><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body">'
+
+      htmlTable+= '<h2>Customize Resource Information</h2><table class="table table-hover customize-table"><thead><tr><th scope="col">Resource Name</th><th scope="col">Resource Description</th><th scope="col">Resource Tag</th></tr></thead><tbody>';
+
+      let f = 1;
+      for(let i=0;i<numberOfUrls;i++)
+      { var row;
+          if (f == 1) {
+            row='<tr class="table-primary"><th scope="row"><input type="text" id="' + urlValues[i] + '" class="form-control" value=" " ></input></th><td><input type="text" id="desc' + urlValues[i] + '" class="form-control" value=" "></input></td><td><input type="text" id="tag' + urlValues[i] + '" class="form-control" value=" "></input></td></tr>';     
+            f = 0;
+          } else {
+            row='<tr class="table-secondary"><th scope="row"><input type="text" id="' + urlValues[i] + '" class="form-control" value=" " ></input></th><td><input type="text" id="desc' + urlValues[i] + '" class="form-control" value=" "></input></td><td><input type="text" id="tag' + urlValues[i] + '" class="form-control" value=" "></input></td></tr>';     
+
+            f = 1;
+          }
+
+        htmlTable += row;
+      }
+
+
+        htmlTable += '</tbody></table>';
+
+        htmlTable += '<button type="button" id="customize-url-submit" class="btn btn-primary" style="margin-left:40%"> Submit</button>';
+
+        htmlTable += '</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div>'
+        const customizeForm = document.getElementById('customize-url');
+        var errorMsg=document.getElementById('error');
+      $.ajax({
+          async: false,
+          type: 'POST',  // http method
+          url: '/resources/viewResource',
+          data: formdata,
+          processData: false,
+          contentType: false,
+          dataType: 'json',
+
+          success: function (data, status, xhr) {
+            errorMsg.innerHTML='';
+            $('#myModal21').modal('hide');
+            customizeForm.innerHTML = htmlTable;
+            $('#myModal22').modal('toggle');
+            
+          },
+          error: function (jqXhr, textStatus, errorMessage) {
+            customizeForm.innerHTML='';
+            errorMsg.innerHTML='invalid youtube url(s)';
+          }
+});
+
+      });
+//on clicking submit in the 2nd modal of url upload          
+         $(document).on('click', '#customize-url-submit', function () {
+          var urlValues = [] ;
+      var urlFileNames = [];
+      var updatedResourceDescriptions=[];
+      var updatedResourceTags=[];
+      const numberOfUrls = document.getElementById("url-number").value;
+      const urls = document.getElementsByClassName("form-control-url");
+      for (let i = 0; i < numberOfUrls; i++) {
+        urlValues.push(urls[i].value);
+        urlFileNames.push(document.getElementById(urlValues[i]).value);
+        let rsrDescId = "desc" + urlValues[i];
+        let f_rsr_description = document.getElementById(rsrDescId);
+        updatedResourceDescriptions.push(f_rsr_description.value);
+        let rsrTagId = "tag" + urlValues[i];
+        let f_rsr_tag = document.getElementById(rsrTagId);
+        updatedResourceTags.push(f_rsr_tag.value);
+      }
+           //console.log(urlValue);
+           $('#myModal22').modal('hide');
+          
+          var x = document.getElementById("NAVHEADER");
+          x.style.top = "-50px";
+          $("#wrapper").toggleClass("toggled");      
+          x = document.getElementById("menu-toggle");
+          x.style.display = "none";
+          
+          $('#navb').css("display", "none");
+          let uploadHtml = '<div id="over" style="margin-left: 300px;"> <img src="../images/upload.gif" alt="Upload logo"> </div>';
+          $('#resourcePageContent').replaceWith(uploadHtml);
+
+          var formdata = new FormData();
+      formdata.append('uploadType', '1');// url upload flag
+      formdata.append('urlValues', urlValues);
+      formdata.append('urlFileNames', urlFileNames);
+      formdata.append('updatedResourceDescriptions', updatedResourceDescriptions);
+      formdata.append('updatedResourceTags', updatedResourceTags);
+           
+     var i = 0;
+      function move()
+      {
+        if (i == 0)
+        {
+          i = 1;
+          let width = 10;
+          var id = setInterval(frame, 1);
+          function frame()
+          {
+            if (width >= 100)
+            {
+              display();
+              clearInterval(id);
+              i = 0;
+            } 
+            else 
+            {
+              width+=100;
+            }
+          }
+        }
+      }
+      move();
+      function display()
+      {
+        $.ajax
+        ({
+          type: 'POST',  // http method
+          url: '/resources/viewResource',
+          data: formdata,
+          processData: false,
+          contentType: false,
+          dataType: 'json',
+
+          success:         
+          function (data, status, xhr)
+          {
+            
+              let str = 'Url Video ';
+              str += urlFileNames;
+              str += ' Uploaded Sucessfully';
+
+              add_notification(str);
+            
+            var x = document.getElementById("NAVHEADER");
+            x.style.top = "0";
+            $("#wrapper").toggleClass("toggled");      
+            x = document.getElementById("menu-toggle");
+            x.style.display = "block";
+            
+            $('#navb').css("display", "flex");
+            let successHtml = '<div class=""><div class="row d-flex justify-content-center text-center"><div class="confirm"><p>Your Resource Has Been Successfuly Submitted And you will Be Notified once Uploded !</p></div></div> <div class="row d-flex justify-content-center"><div> <img src="../images/success.gif" alt="GeeksforGeeks logo"> </div> </div><a href="/resources/viewResource">Upload more resources</a></div>';
+            $('#over').replaceWith(successHtml);
+            console.log(str);
+            showUploaded(str);
+          },       
+        });
+      }
+     });
+     
+      </script>
+
+    <!-- /#page-content-wrapper -->
+      </div>
+
+    </div>  
+    <div id="divModal"></div>
+    <div id="divTxtModal"></div> 
+    <div id="customize-form" style="position: absolute;">      
+    </div>
+    <div id="customize-url" style="position: absolute;">
+    </div>
+<div id="edit-form" style="position: absolute;">        
+</div>    
+</div>
+
+

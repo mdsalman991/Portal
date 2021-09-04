@@ -1,0 +1,61 @@
+
+<div class="d-flex toggled" id="wrapper">
+  <%- include('./partials/sidebar.ejs') %>
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+
+      <nav class="navbar navbar-expand-lg navbar-light">
+        <ul class="navbar-nav mr-auto">
+        <button class="btn btn-secondary" id="menu-toggle"><i class="fas fa-bars fa-2x" aria-hidden="true"></i></button>
+        </ul>
+        <form class="form-inline my-2 my-lg-0 search-form">
+          <input class="form-control mr-lg-2" type="text" id="search-input" placeholder="Search">
+          <button class="btn btn-round btn-outline-primary my-2 my-sm-0" type="submit"><i class="fas fa-search" aria-hidden="true"></i>&nbsp;Search</button>
+        </form>
+      </nav>
+
+      <div class="row">
+	          
+        <div class="col-2"></div>
+
+        <div class="col-8" id="resourceGroupCard">
+          <center><h2 class="mt-4" style="font-family: 'Langar';">  Resource Collections  </h2></center>
+          <% resourceGroupList.forEach(function(resourceGroup) { %>
+
+            <% var tagString = ""; %>
+            <% for (var i = 0; i < resourceGroup.resourceGroupTags.length; i++){ %>
+            <%  if (i > 0){ tagString += ", "; } %>
+            <% tagString += resourceGroup.resourceGroupTags[i].tagName %>
+            <% } %>
+
+            <div class="card border-dark mb-6" style="max-width: 80rem; max-height: 80rem; margin-top:20px; margin-bottom: 20px;">
+              <div class="card-body">
+                <h4 class="card-title" style="margin-bottom:0.01rem;"><%= resourceGroup.resourceGroupName %></h4>
+                <small class="text-muted" style="margin-bottom: 5rem;"><i class="fas fa-user"></i>&nbsp;<%= resourceGroup.createdByUsername %></small>
+                <small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-clock"></i>&nbsp;<%= resourceGroup.totalAttentionTime %>&nbsp;mins</small>
+                <small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-tags" aria-hidden="true"></i>&nbsp;<%= tagString %></small>
+                <p class="card-text"><%= resourceGroup.resourceGroupDescription %></p>
+                <br/><br/>
+
+                <p class="card-text" style="margin-bottom:0.01rem;"><%= resourceGroup.resources.length %> documents in the resource</p>
+                
+               <a href="javascript:myFunc('<%= resourceGroup._id %>')" class="btn btn-round btn-outline-primary my-2 my-sm-0" role="button">View Resources</a>
+              </div>
+            </div>
+          <% }); %>
+
+        </div>
+
+        <div class="col-2"></div>
+      </div>
+
+      
+</div>
+
+</div>  
+<div id="divModal"></div>
+<div id="divTxtModal"></div>
+    
+
+

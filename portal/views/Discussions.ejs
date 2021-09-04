@@ -1,0 +1,78 @@
+<div class="d-flex" id="wrapper">
+    <%- include('./partials/sidebar.ejs') %>
+    <!--Page content-->
+    <div id="page-content-wrapper">
+<nav class="navbar navbar-expand-lg navbar-light">
+    <ul class="navbar-nav mr-auto">
+        <button class="btn btn-secondary" id="menu-toggle"><i class="fas fa-bars fa-2x" aria-hidden="true"></i></button>
+        </ul>
+    <form class="form-inline my-2 my-lg-0 search-form">
+      <input class="form-control mr-lg-2" type="text" id="search-input" placeholder="Search">
+      <button class="btn btn-round btn-outline-primary my-2 my-sm-0" type="submit"><i class="fas fa-search" aria-hidden="true"></i>&nbsp;Search</button>
+    </form>  
+</nav>
+
+<!--Discussion Forum Container-->
+<div class="discussion-forum">
+    <h1 style="font-family: 'Langar';">Discussion Forum</h1>
+    
+    <% if(dtype === "resource"){%>
+        <h5 style="font-family: 'Langar';"><%= res.resourceName %></h5>
+        <a class="btn btn-discussion btn-round btn-outline-primary my-2 my-sm-0" href="/discussions/start/r/<%= r_id %>">Start Discussion</a>
+    <% } else { %>
+        <h5 style="font-family: 'Langar';"><%= r_id %></h5>
+        <a class="btn btn-discussion btn-round btn-outline-primary my-2 my-sm-0" href="/discussions/start/p/<%= r_id %>">Start Discussion</a>
+    <% }%>
+    <div id="discussionSearch">
+        <div class="discussions-list">
+            <% for (let discussion of discussions){%>
+                <li class="discussion-item">
+                    <a href="/discussions/<%= discussion._id %>">
+                    <%= discussion.title %>
+                    </a>  
+                    <div class="discussion-info">
+                        <%= discussion.votes.length %> points 
+                        by <%= discussion.username %>
+                    </div>
+                </li>
+            <hr>
+            <% }%>
+        </div>
+    <!--Discussion Search-->
+    </div>
+    <form id="form<%= m_id %>" action="/learningMaps/viewMap" method="GET">
+        <% if(m_id !== "none"){%>
+            <a class="btn btn-discussion btn-round btn-outline-primary my-2 my-sm-0" href="/discussions/m/<%= m_id %>">Main Discussion Forum</a>
+            <input type="hidden" name="learningMapId" value="<%= m_id %>"/>
+            <button id="<%= m_id %>" class=" btn btn-discussion btn-round btn-outline-primary my-2 my-sm-1" type="submit">Go to Map</button>
+        <% } else {%>
+            <a class="btn btn-discussion btn-round btn-outline-primary my-2 my-sm-0" href="/resources/viewResource">All Resources</a>
+        <% }%>
+
+    </form>
+<!--Discussion Forum -->
+</div>
+</div>
+</div>
+<script>
+    var discussions =  <%- JSON.stringify(discussions) %>;
+    $(".search-form").submit(function(event){
+
+    event.preventDefault();
+
+    var searchInput = document.getElementById("search-input").value;
+    searchInput = searchInput.toLowerCase();
+    var displayHTML = '<div class="discussions-list">';
+    for (var i = 0; i < discussions.length; i++){
+        var temp = discussions[i].title.toLowerCase()
+        if (temp.includes(searchInput)){
+            console.log("hi")
+            displayHTML += '<li class="discussion-item">'; 
+            displayHTML += '<a href="/discussions/'+ discussions[i]._id +'">'+ discussions[i].title +'</a>  <div class="discussion-info">'+ discussions[i].votes.length +' points  by '+ discussions[i].username +'</div></li><hr>'; 
+        }
+    }
+    displayHTML += '</div>'
+    document.getElementById("discussionSearch").innerHTML = displayHTML;
+    });
+
+</script>

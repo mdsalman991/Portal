@@ -1,0 +1,159 @@
+<div class="d-flex" id="wrapper">
+    <%- include('./partials/sidebar.ejs') %>
+    <!--Page content-->
+    <div id="page-content-wrapper">
+            
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <ul class="navbar-nav mr-auto">
+            <button class="btn btn-secondary" id="menu-toggle"><i class="fas fa-bars fa-2x" aria-hidden="true"></i></button>
+            </ul>
+            <form class="form-inline my-2 my-lg-0 search-form">
+              <div class="form-group" style="margin-right: 5px;">
+                    <select class="custom-select" id="dTypeDropdown">
+                      <option selected="" value="all">All</option>
+                      <option value="resource">Resource</option>
+                      <option value="path">Pathways</option>
+                    </select>
+              </div>
+              <input class="form-control mr-lg-2" type="text" id="search-input" placeholder="Search">
+              <button class="btn btn-round btn-outline-primary my-2 my-sm-0" type="submit"><i class="fas fa-search" aria-hidden="true"></i>&nbsp;Search</button>
+            </form>  
+        </nav>
+
+        <!--Discussion Forum Container-->
+        <div class="discussion-forum">
+            <h2 style="font-family: 'Langar';">Discussion Forum</h2>
+            <h3 style="font-family: 'Langar';"><%= mapName %></h3>
+            <div id="discussionSearch">  
+                <div class="discussions-list">
+                    <% for(var i=0; i < r_ids.length; i++) {%>
+                        <li class="discussion-item">
+                            <% if(r_names[i].length > 0) {%>
+                                <a href="/discussions/r/<%= r_ids[i] %>" >
+                                Discussions for <%= r_names[i] %>
+                                </a>  
+                                | Resource
+                            <% } else {%>
+                                <a href="/discussions/p/<%= r_ids[i] %>" >
+                                Discussions for <%= r_ids[i] %>
+                                </a> 
+                                | Path
+                            <% }%>
+                        </li>
+                    <hr>
+                    <% }%>
+                </div>
+            <!--Discussion Search-->
+            </div>  
+            <a class="btn btn-discussion btn-round btn-outline-primary my-2 my-sm-0" href="/learningMaps/viewAllMaps">Back</a>
+        <!--Discussion Forum    -->
+        </div>
+    <!--Page content wrapper-->
+    </div>
+<!--D-flex wrapper-->
+</div>
+
+<script>
+    var r_ids =  <%- JSON.stringify(r_ids) %>;
+    var r_names =  <%- JSON.stringify(r_names) %>;
+    $(".search-form").submit(function(event){
+
+    event.preventDefault();
+
+    var searchInput = document.getElementById("search-input").value;
+    searchInput = searchInput.toLowerCase();
+    var dTypeDropdown = document.getElementById("dTypeDropdown").value;
+    var displayHTML = '<div class="discussions-list">';
+    for (var i = 0; i < r_ids.length; i++){
+        if(dTypeDropdown === "all"){
+            if(r_names[i].length > 0){
+                var temp = r_names[i].toLowerCase()
+                if (temp.includes(searchInput)){
+                    displayHTML += '<li class="discussion-item">'; 
+                    displayHTML += '<a href="/discussions/r/'+ r_ids[i] +'"> Discussions for ' + r_names[i] +' </a>  | Resource</li><hr>'; 
+                }
+            }
+            else{
+                var temp = r_ids[i].toLowerCase()
+                if (temp.includes(searchInput)){
+                    displayHTML += '<li class="discussion-item">'; 
+                    displayHTML += '<a href="/discussions/p/'+ r_ids[i] +'"> Discussions for ' + r_ids[i] +' </a>  | Path</li><hr>'; 
+                }
+            }
+        }
+        else{
+            if(dTypeDropdown === "resource"){
+                if(r_names[i].length > 0){
+                    var temp = r_names[i].toLowerCase()
+                    if (temp.includes(searchInput)){
+                        displayHTML += '<li class="discussion-item">'; 
+                        displayHTML += '<a href="/discussions/r/'+ r_ids[i] +'"> Discussions for ' + r_names[i] +' </a>  | Resource</li><hr>'; 
+                        console.log("hi")
+                    }
+                    
+                }
+            }
+            else{
+                if(r_names[i].length === 0){
+                    var temp = r_ids[i].toLowerCase()
+                    if (temp.includes(searchInput)){
+                        displayHTML += '<li class="discussion-item">'; 
+                        displayHTML += '<a href="/discussions/p/'+ r_ids[i] +'"> Discussions for ' + r_ids[i] +' </a>  | Path</li><hr>'; 
+                    }
+                }
+            }
+        }
+    
+    }
+    displayHTML += '</div>'
+    document.getElementById("discussionSearch").innerHTML = displayHTML;
+    });
+
+    $(".notifications .icon_wrap").click(function()
+    {
+      $(this).parent().toggleClass("active");
+      $.ajax
+      ({
+            url: "/resources/notification",
+            type: "get", //send it through get method
+            contentType: "application/json",
+
+            success: function(response)
+            {              
+              var lis = document.getElementById("Notification_ALL");
+              lis_length = lis.children.length;
+              for (let i = 0; i < lis_length; i++)
+              {
+                lis.removeChild(lis.children[0]);
+              }
+              console.log(lis.children.length);
+
+              response.noti.forEach(element => 
+              { 
+                var li = document.createElement("li");
+                var inputValue = element.message;
+                console.log(inputValue);
+                  if(inputValue.substring(0,2) == "TA"){
+                    console.log(inputValue);
+                    var a = document.createElement('a');
+                    var linkText = document.createTextNode(inputValue);
+                    a.appendChild(linkText);
+                    a.title = "Intervention OR Thread closing";
+                    var href = inputValue.substring(23, inputValue.length);
+                    a.href = "/discussions/" + String(href);
+                    li.appendChild(a);
+                    lis.appendChild(li);
+                  }
+                  else{
+                var t = document.createTextNode(inputValue);
+                li.appendChild(t);
+                lis.appendChild(li);
+                  }
+              });
+            },
+            error: function(xhr){
+              console.log("Add Error!");
+            }
+      });
+    });
+</script>

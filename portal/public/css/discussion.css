@@ -1,0 +1,326 @@
+@import url("https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
+
+/* Discussion Forum Home Page */
+h4{
+    margin-top: 0.5rem;
+
+}
+
+pre{
+    margin-bottom: 0;
+
+}
+
+.discussion{
+    width: 100%;
+    overflow: hidden;
+    margin-top: 5%;
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-bottom: 5%;
+    padding: 2%;
+    border: 2px solid;
+    border-radius: 4px;
+}
+
+.startDiscussion, .discussion-forum{
+    overflow: hidden;
+    margin-top: 2%;
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-bottom: 2%;
+    padding: 2%;
+    border: 2px solid;
+    border-radius: 4px;
+}
+
+.discussion-forum h2{
+    font-size: 1.975rem;
+}
+
+.discussions-list{
+    margin-left: 1.5%;
+    margin-top: 1.0rem;
+    padding: 0;
+}
+
+.discussion-item{
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.discussion-item a{
+    font-weight: 800;
+}
+
+.discussion-item a:hover{
+    color: #5ebadf;
+    text-decoration: none;
+}
+
+.discussion-item .discussion-info{
+    font-size: 0.750rem;
+
+}
+
+/* Discussions page */
+.discussion .discussion-header{
+    margin-top: 1.0rem;
+}
+
+.upvote-question{
+    height: 35px;
+    width: 35px;
+    display: inline-block;
+    text-align: center;
+    line-height: 35px;
+    color: #fff;
+    background-color: black;
+    border-radius: 50%;
+    text-decoration: none;
+    -webkit-transform: scale(0.75);
+    transform: scale(0.75);
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+.votes button:hover{
+    -webkit-transform: scale(1.0);
+    transform: scale(1.0);
+}
+
+/* Add Answer Field */
+
+.hidden{
+    display: none;
+}
+.btn-answer{
+    margin-top: 4.5rem;
+}
+
+.answer-field{
+    margin-top: 1.5rem;
+    /*margin-top: 1.5rem;*/
+    border: 0.5px solid;
+    padding: 1.2rem;
+    border-radius: 4px;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+.answer-field .form-group:focus{
+    -webkit-box-shadow: 0 0 10px rgba(48, 46, 77, 0.03);
+    box-shadow: 0 0 10px rgba(48, 46, 77, 0.03);
+}
+.answer-field .form-group label{
+    font-size: 0.950rem;
+}
+
+/*.answer-field .form-group input{*/
+    /*border-radius: 4px;*/
+    /*margin-bottom: 1.5rem;*/
+/*}*/
+
+.answer-field .form-group textarea{
+    margin-bottom: 1.2rem;
+
+}
+
+/* Answers */
+.answers-container{
+    margin-top: 1.5rem;
+}
+
+.answers-container h4{
+    font-family: "Langar";
+}
+
+.answers-container .answer-body{
+    font-size: 1.075rem;
+    margin-bottom: 0;
+    font-family: "Nunito-Sans";
+
+}
+
+.answers-container .answer-info{
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.answers-container .upvote-answer, .answers-container .unvote-answer, .upvote-comment, .unvote-comment{
+    height: 35px;
+    width: 35px;
+    text-align: center;
+    line-height: 35px;
+    color: #fff;
+    background-color: black;
+    border-radius: 50%;
+    text-decoration: none;
+    -webkit-transform: scale(0.75);
+    transform: scale(0.75);
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+.answers-container .upvote-answer button:hover, .answers-container .unvote-answer button:hover{
+    -webkit-transform: scale(1.0);
+    transform: scale(1.0);
+}
+
+.verify{
+    font-weight: 800;
+    font-family: "Langar";
+}
+
+.btn-discussion{
+    border: 2px solid;
+    /*width: 7rem;*/
+    padding: 0.5% 1.0%;
+    /*line-height: 1.5;*/
+    /*margin-left: 5%;*/
+    /*margin-top: 15%;*/
+    margin-right: 1.5%;
+    margin-left: 1.5%;
+    decoration: none;
+}
+.TA_verify_a, .TA_verify_c{
+    float: right;
+}
+
+/* Comments */
+.comments{
+    margin-left: 2px;
+    border-left: 4px solid rgba(0, 0, 0, 0.1);
+}
+
+.comments .comment-body{
+    font-size: 1.075rem;
+    font-family: "Nunito-Sans";
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+.comments .comment-info{
+    margin-top: 0.5rem;
+    margin-left: 1.5rem;
+    margin-bottom: 0.5rem;
+    
+}
+
+/* Comment field */
+.comment-field{
+    margin-top: 1.5rem;
+    border: 1px solid;
+    padding: 1.5rem;
+    border-radius: 4px;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+.comment-field .form-group:focus{
+    -webkit-box-shadow: 0 0 10px rgba(48, 46, 77, 0.03);
+    box-shadow: 0 0 10px rgba(48, 46, 77, 0.03);
+}
+.comment-field .form-group label{
+    display: inline-block;
+    font-size: 0.950rem;
+}
+.comment-field .form-group input{
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+}
+
+.toggle-comments{
+    display: inline-block;
+}
+
+.toggle-comments:hover{
+    color: black;
+    display: inline-block;
+    text-decoration: underline;
+    cursor:pointer;
+}
+/* TA intervention and verification */
+
+.comments-disabled{
+    margin-top: 15px;
+    border: 2px solid;
+    border-top: 6px solid;
+    padding: 1%;
+    font-family: "Langar";
+}
+
+
+.require {
+    color: #666;
+}
+label small {
+    color: #999;
+    font-weight: normal;
+}
+
+/*Annotation*/
+.annotation{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex;
+    align-items: center;
+    float: right;
+    margin-right: 2%;
+    /*margin-right: 1.2%;*/
+
+}
+.annotation .annotation-form{
+    /*display: flex;*/
+    /*flex-direction: row;*/
+    /*align-items: center;*/
+
+}
+
+.annotation .form-group{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+}
+
+.annotation .annotation-label{
+    overflow: none;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    padding-top: 2.5%;
+}
+
+select#role.form-control{
+    width: 8.75rem;
+}
+
+.annotation .form-group .form-control{
+    height: 2.0rem;
+    font-size: 0.875rem;
+    padding: 2%;
+    margin-left: 2.5%;
+    margin-right: 2%;
+    /*line-height: 1;*/
+    position: relative;
+
+}
+
+.annotation .form-group button{
+    margin-left: 5%;
+    /*margin-right: 15%;*/
+    /*padding: 1.5% 1.0%;*/
+}
+
+.btn-annotate{
+    padding: 7.5%;
+    /*background-color: red;*/
+    margin-right: 15%;
+}
+
+.btn-annotation{
+    padding: 2%;
+    margin-right: -5%;
+}
+
+

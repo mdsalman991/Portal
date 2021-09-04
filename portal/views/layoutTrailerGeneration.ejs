@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+     
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossOrigin="anonymous">
+    
+    <link
+      rel="stylesheet"
+      href="https://bootswatch.com/4/lux/bootstrap.min.css"
+      crossorigin="anonymous"
+    />
+    
+    <link rel="stylesheet" href="../css/main.css" />
+    
+    <link href="../css/simple-sidebar.css" rel="stylesheet" crossOrigin="anonymous"/>
+    
+    <link href="../css/quick-tour.css" rel="stylesheet"/>
+                
+    <title>PLE portal</title>
+</head>
+<style>
+  * {
+  box-sizing: border-box;
+}
+.column {
+  float: left;
+  width: 20%;
+  padding-left: 5px;
+}
+.row {margin: 0 5px; grid-row-gap: 5px;}
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+@media screen and (max-width: 600px) {
+  .column {
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+  }
+}
+.templates
+{
+  width:200px; 
+  height:150px; 
+  border: 1px solid black;
+
+}
+.templates:hover
+{ 
+  
+  border: 5px solid darkgray;
+
+}
+.modal {
+    overflow-y:auto;
+  }
+  
+ tr,th {
+  border: 1px solid #dddddd;  
+  padding: 8px;
+}
+td {
+    
+  padding: 8px;
+}
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+#rsr-table {
+  overflow-y: scroll;
+  max-height:250px;
+}
+.flex-container{
+  display: flex;
+}
+.section-divider{
+  width:100%;
+  border-top: 1px solid darkgrey;
+  margin:15px;
+}
+.inf-icon{
+  position:relative;
+  top:8px;
+}
+.page-container {
+  display: table;
+  width: 100%;
+}
+.col-left {
+  width:75%;
+  display: table-cell;
+  padding-right: 10px;
+}
+.col-right {
+  width:25%;
+  display: table-cell;
+  border: 1px solid #dddddd;
+  border-top: none;
+  padding-left: 10px;
+}
+.suggestions-container{
+  display: flex;
+  height: 730px;
+  flex-direction: column;
+}
+.suggestions-row{
+  width: 100%;
+  flex-grow: 1;
+  overflow:scroll;
+}
+</style>
+<body>
+    <%- include('./partials/header.ejs') %>
+    <%- body %>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossOrigin="anonymous"></script>
+      <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+      integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+      crossOrigin="anonymous"
+    ></script>
+    <!--for the bootstraptour --> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.12.0/js/bootstrap-tour-standalone.min.js"></script>
+    
+
+<script>
+    var clickSource=<%- JSON.stringify(localStorage.getItem("clickSource"))%>; 
+    var pathwayId=<%-JSON.stringify(localStorage.getItem("pathwayId"))%>;
+    var mapId=<%-JSON.stringify(localStorage.getItem("mapId"))%>;
+    //console.log(typeof(clickSource));
+    //console.log(mapId);
+    //console.log(pathwayId);
+
+$(document).ready(function () { 
+    
+      if(clickSource=="viewMapPage") { 
+            document.getElementById("fetch-paths").click();                
+          } 
+        $("#wrapper").toggleClass("toggled");
+      });
+
+$("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+        
+      });
+
+$("#map-drop").click((e) => {
+        const dropdown = document.getElementsByClassName("map-drop-item");
+        Array.from(dropdown).forEach(item => {
+          if (item.style.display === "block") {
+            item.style.display = "none";
+          } else {
+            item.style.display = "block";
+          }
+        }); 
+      });
+
+$("#resource-drop").click((e) => {
+        const dropdown = document.getElementsByClassName("resource-drop-item");
+        Array.from(dropdown).forEach(item => {
+          if (item.style.display === "block") {
+            item.style.display = "none";
+          } else {
+            item.style.display = "block";
+          }
+        });
+      });
+// on click of the image it opens a modal with the video playing
+$(document).on('click','.vpop',function(e) {
+
+$('.videopreview').attr('src', $(this).find('img').attr('src').slice(0,-3)+"mp4");
+$('#enlarged-view').modal('show');
+});
+
+// on click of the image it opens a modal with the image in bigger size
+$(document).on('click','.ipop',function(e) {
+
+			$('.imagepreview').attr('src', $(this).find('img').attr('src'));
+			$('#enlarged-view').modal('show');
+});
+
+$("#fetch-paths").click((e) => {
+var checker=document.getElementById("map-select").value;
+
+if(checker=="")
+{
+var container=document.getElementById("map-error");
+container.innerHTML='Please select a map!';
+container=document.getElementById("map-select");
+container.style.border="1px solid goldenrod";
+}
+else{
+var container=document.getElementById("map-error");
+container.innerHTML='';
+container=document.getElementById("map-select");
+container.style.border="1px solid black";
+$.ajax
+        ({
+          type: "get",
+          url: '/learningMaps/fetchPaths',
+          data: { 
+                mapId: checker
+              },
+          contentType: "application/json",
+
+          success:         
+          function (response)
+          {
+            var change=document.getElementById("path-select");
+           var html='<option value="">--Please choose a path--</option>';
+           for (let i = 0; i < response.pathways.length; i++) {
+  
+             if(clickSource=="viewMapPage" && (JSON.stringify(response.pathways[i])==pathwayId)){
+              html+='<option value="'+response.pathways[i] +'" selected>'+response.pathways[i]+'</option>';  
+             }
+             else{
+             html+='<option value="'+response.pathways[i] +'">'+response.pathways[i]+'</option>';}
+           }
+           change.innerHTML=html;
+           if(clickSource=="viewMapPage"){
+            
+            document.getElementById("fetch-resources").click();
+            $.ajax
+              ({
+                type: "get",
+                url: '/learningMaps/dataInLocalStorage',
+                data: { 
+                     action:"remove",
+                    },
+                contentType: "application/json",
+              });
+           }
+          },
+        });
+}
+});
+
+$("#fetch-resources").click((e) => {
+var checker=document.getElementById("path-select").value;
+
+if(checker=="")
+{
+var container=document.getElementById("path-error");
+container.innerHTML='Please select a path!';
+container=document.getElementById("path-select");
+container.style.border="1px solid goldenrod";
+}
+else{
+var container=document.getElementById("path-error");
+container.innerHTML='';
+container=document.getElementById("path-select");
+container.style.border="1px solid black";  
+$.ajax
+        ({
+          type: "get",
+          url: '/learningMaps/fetchResources',
+          data: { 
+                pathwayId: checker
+              },
+          contentType: "application/json",
+
+          success:         
+          function (response)
+          {var change=document.getElementById('resources');
+           var html='<h4>Resources found:</h4><div id="rsr-table" style="width:max-content";><table>';
+           var rsrs= response.resources;
+           for (let i = 0; i < rsrs.length; i++) {
+            var rsrTypeIcon;
+            var tagString = ""; 
+            for (var j = 0; j < rsrs[i].resourceTags.length; j++){ 
+              if (j > 0){ tagString += ", "; } 
+              tagString += rsrs[i].resourceTags[j].tagName 
+             }
+            html+='<tr><td>';
+            html+='<input type="checkbox" class ="resources-checkbox" id="'+rsrs[i]._id+'"/><label style="margin-left:5px;" for="'+rsrs[i]._id+'">'+rsrs[i].resourceName+'</label></td><td>';
+            html+='<small class="text-muted" >&nbsp;&nbsp;<i class="fas fa-clock"></i>&nbsp;'+ rsrs[i].attentionTime +'&nbsp;mins</small></td><td><small class="text-muted" >&nbsp;&nbsp;<i class="fas fa-tags" aria-hidden="true"></i>&nbsp;'+tagString+'</small></td><td>'; 
+            if (rsrs[i].resourceType === 'Text'){ 
+              rsrTypeIcon='<small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-file-alt" aria-hidden="true"></i>Text</small>'; 
+             } 
+
+            if (rsrs[i].resourceType === 'Pdf'){ 
+              rsrTypeIcon='<small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-file-pdf" aria-hidden="true"></i>&nbsp;Pdf</small>'; 
+             } 
+
+            if (rsrs[i].resourceType === 'Video'){ 
+              rsrTypeIcon='<small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-video" aria-hidden="true"></i>Video</small>'; 
+             }
+
+            html+=rsrTypeIcon;
+            html+=('</td><td><button id="'+rsrs[i].resourceLocation.originalLocation+'" class="btn btn-round btn-outline-primary my-2 my-sm-0 viewrsr" style="margin-left:10px;padding:5px 10px;">View</button>');
+            html+='</td></tr>';
+           }
+           html+='</table></div><br><button type="button" id="select-all" class="btn btn-round btn-outline-primary my-2 my-sm-0" style="padding:3px;">Select All</button><button type="button" id="clear-all" class="btn btn-round btn-outline-primary my-2 my-sm-0" style="margin-left:5px;padding:3px;">Clear All</button>';
+           change.innerHTML=html;
+          },
+        });
+      }
+});
+// on click of view button of any resource in the Resources Found section
+$(document).on('click', '.viewrsr', function () {
+  var location = this.id;
+  var locationList = location.split('/');
+  var originalName = locationList[locationList.length - 1];
+  $('.videopreview').attr('src','../datastore/raw/'+originalName);
+  $('#enlarged-view').modal('show');
+});
+// on click of select all button of in the Resources Found section-- it ticks out all the checkboxes of the resources
+$(document).on('click', '#select-all', function () {
+  var checkboxes = document.getElementsByClassName('resources-checkbox');
+  
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = true;
+  }
+});
+// on click of clear all button of in the Resources Found section-- it clears all the checkboxes of the resources
+$(document).on('click', '#clear-all', function () {
+  var checkboxes = document.getElementsByClassName('resources-checkbox');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = false;
+  }
+});
+
+var data;
+var tour;
+// when the generate trailer button of the trailer generation dashboard is clicked
+  $(document).on('click', '#generate-trailer1', function () {  
+  $.ajax
+        ({
+          type: "get",
+          url: 'http://127.0.0.1:8000/generate_trailer',
+          dataType:"json",
+          async:false,
+          success:         
+          function (response)
+          {
+            data=response.response;
+
+          },
+          error: function (jqXhr, textStatus, errorMessage) {
+            console.log(errorMessage);
+          }
+        });
+ 
+var html='<div class="flex-container" style="margin-top:3px;"><h2 class="mt-4"font-family: "Langar"; style="margin-left:35%;">Creator&#39;s Dashboard</h2><button type="button" id="quick-tour" class="btn btn-round btn-outline-primary my-2 my-sm-0" style="margin-left:35%;padding:6px 12px;">Tour</button></div><div class="page-container"><div class="col-left"><div class="flex-container"><div class="section-divider"></div><i class="fa fa-info-circle inf-icon" ></i></div>';
+html+='<div id="section-1"><div class="flex-container" style="margin-left:25%;"><iframe style="margin:3px 0px;margin-left:10px" src="/trailer_generation/template_2/'+data.view_area.trailer_path+'" alt="Frame" height="200"></iframe><div style="flex-grow:1;margin:10px;margin-left:25px;">Details:';
+html+=('<br>1. '+data.view_area.description_1+'<br>2. '+data.view_area.description_2+'<br><br>');
+html+=('<a href="/trailer_generation/template_2/'+data.view_area.trailer_path+'" download><i class="fas fa-download fa-lg"></i></a>&nbsp;&nbsp;<i class="fa fa-paperclip fa-lg"></i>');
+html+='</div></div></div><div class="flex-container"><div class="section-divider"></div><i class="fa fa-info-circle inf-icon" ></i></div>';
+html+='<div id="cards" class="row" >';
+
+var container = document.getElementById('tgPage-content');
+        
+data.frame_editing_area.forEach((result, idx) => { 
+var path="/trailer_generation/template_2/";
+path=path+data.frame_editing_area[idx].frame_path;
+
+html += '<div class="column"><div class="card" draggable="true"><div class="card-header"  id="heading-'+idx+'" style="padding:0;"><button style="float:left" data-toggle="modal" data-target="#editModal" class="far fa-edit" id="editFrame'+idx+'" onclick= \'clickEditFrame('+idx+') \'></button>';
+html+='</div><div class="card-body"><a href="#" class="ipop"><img src="'+path+'" alt="Frame" width="100%" height="100"></a></div></div></div>';
+
+})
+
+html+='</div><div class="flex-container"><div class="section-divider"></div><i class="fa fa-info-circle inf-icon" ></i></div>';
+html+='<div id="section-3"style="margin:0px 8px;"><input type="checkbox" id="voiceover_checkbox"/><label for="voiceover_checkbox" style="margin-left:3px;">Voiceover</label><div id="voiceover-options" style="margin:0px 10px;"></div><br><input type="checkbox" id="subtitles_checkbox"/><label for="subtitles_checkbox" style="margin-left:3px;">Subtitles</label><div id="subtitles-options" style="margin:0px 10px;"></div><br><input type="checkbox" id="wordcloud_checkbox"/><label for="wordcload_checkbox" style="margin-left:3px;">Wordcloud</label><div id="wordcloud-options" style="margin:0px 10px;"></div></div></div>';
+html+='<div class="col-right" id="suggestions-section"><h4 style="margin:0px 5px;" >Suggestions</h4><div class="suggestions-container">';
+  for (let i = 0; i < Object.keys(data.suggestions_area).length; i++) {
+    if(i==0)
+    {
+      html+='<div class="flex-container"><div class="section-divider"></div><i class="fa fa-info-circle inf-icon" ></i></div>';
+    }
+    else{
+      html+='<div class="section-divider"></div>';
+    }
+    html+=('<div class="suggestions-row"><p style="font-weight:900;font-family:Arial;">'+ (Object.keys(data.suggestions_area)[i]).toUpperCase()+'</p><br>');
+    for (let j = 0; j < data.suggestions_area[Object.keys(data.suggestions_area)[i]].length; j++) {
+      html+=('<p>'+(j+1)+'. '+ data.suggestions_area[Object.keys(data.suggestions_area)[i]][j] +'</p>');
+    }
+    html+='</div>';
+  }
+  html+='</div></div></div><div><center><button type="button" id="goNext" class="btn btn-round btn-outline-primary my-2 my-sm-0" >Generate Trailer</button></center></div>';
+
+container.innerHTML = html;
+container = document.getElementById('preview');
+container.innerHTML='<img src="" class="imagepreview" style="width: 100%; height: 100%;" >';
+
+$( "#cards" ).sortable();
+$( "#cards" ).disableSelection();
+//var template='<div class="popover tour"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div><div class="popover-navigation"><button class="btn btn-default" data-role="prev">« Prev</button><span data-role="separator">|</span><button class="btn btn-default" data-role="next">Next »</button></div><button class="btn btn-default" data-role="end">End tour</button></div>';
+tour = new Tour({  
+  
+  steps: [
+    {
+        element:"#section-1",
+        title:"Trailer Viewing Area",
+        content:"The Trailer Viewing area let's you to play the auto-generated trailer based on user inputs. The mp4 player has all necessary functionalities like full screen, scrubbing, volume control, etc You can also download the trailer on to your local system by clicking on download icon and even attach this trailer to required pathway in just one click by clicking on attachment icon.",
+        placement:"left",
+        backdrop:true,
+    },
+    {
+        element:"#cards",
+        title:"Frame Editing Area",
+        content:"The Frame Editing area let's you play around with editable sections for every frame in the trailer. As of now, editing the text and images are possible types of editing that we support. You can always head on to editing any frame by clicking on edit icon.",
+        placement:"left",
+        backdrop:true,
+    },
+    {
+        element:"#section-3",
+        title:"Meta-data Editing Area",
+        content:"The Meta-data Editing area allows you to make some important choices and customizations for decidind the look and feel of a given trailer. Here you can go about deciding whether you want subtitles or not, have voice selection for trailer voiceovers, etc",
+        placement:"right",
+        backdrop:true,
+    },
+    {
+        element:"#suggestions-section",
+        title:"Suggestions Area",
+        content:"The Suggestions area is a helper section that shows other predictions made by the trailer generation model. You can always utilize this section as supervision to when trying to edit information across any frame.",
+        placement:"left",
+        backdrop:true,
+    },
+  ]
+});
+//tour.init();
+//tour.restart();
+});
+// when the tour button of the creator's dashboard is clicked
+$(document).on('click', '#quick-tour', function () {
+  tour.init();
+  tour.restart();
+});
+//renders different voices(html) when voiceover checkbox is ticked 
+$(document).on('change', '#voiceover_checkbox', function () {
+  var html=document.getElementById("voiceover-options");
+  var content;
+  if(this.checked)
+  {
+         content='<input type="radio" name="voice-selection" id="voiceover_male1"/><label for="voiceover_male1" style="margin-left:3px;">Male-1</label>&nbsp;<i class="fas fa-volume-up sound" id="male_1"></i><br>';
+         content+='<input type="radio" name="voice-selection" id="voiceover_male2"/><label for="voiceover_male2" style="margin-left:3px;">Male-2</label>&nbsp;<i class="fas fa-volume-up sound" id="male_2"></i><br>';
+         content+='<input type="radio" name="voice-selection" id="voiceover_female1"/><label for="voiceover_female1" style="margin-left:3px;">Female-1</label>&nbsp;<i class="fas fa-volume-up sound" id="female_1"></i><br>';
+         content+='<input type="radio" name="voice-selection" id="voiceover_female2"/><label for="voiceover_female2" style="margin-left:3px;">Female-2</label>&nbsp;<i class="fas fa-volume-up sound" id="female_2"></i>';
+  
+  }
+  else{
+       content='';
+  }
+  html.innerHTML=content;
+  });
+
+var myAudio=new Audio();
+$(document).on('click', '.sound', function () {
+  myAudio.pause();
+  myAudio= new Audio("/trailer_generation/template_2/data/default/voices/"+this.id+".wav");
+  myAudio.play();
+});
+
+document.addEventListener('play', function(e){
+    var audios = document.getElementsByTagName('audio');
+    console.log(audios);
+    for(var i = 0, len = audios.length; i < len;i++){
+        if(audios[i] != e.target){
+            audios[i].pause();
+        }
+    }
+}, true);
+//renders upload/download options when subtitles checkbox is ticked
+$(document).on('change', '#subtitles_checkbox', function () {
+  var html=document.getElementById("subtitles-options");
+  if(this.checked)
+  {
+    html.innerHTML='<i class="fas fa-upload fa-lg"></i><input type="file">/<i class="fas fa-download fa-lg"></i>';
+    //'<input type="checkbox" id="subtitles_upload"/><label for="subtitles_upload" style="margin-left:3px;">Upload</label><br><input type="checkbox" id="subtitles_download"/><label for="subtitles_download" style="margin-left:3px;">Download</label>';
+  }
+  else{
+    html.innerHTML='';
+  }
+});
+//renders upload/download options when wordcloud checkbox is ticked
+$(document).on('change', '#wordcloud_checkbox', function () {
+  var html=document.getElementById("wordcloud-options");
+  if(this.checked)
+  {
+    html.innerHTML='<i class="fas fa-upload fa-lg"></i><input type="file">/<i class="fas fa-download fa-lg"></i>';
+    //'<input type="checkbox" id="wordcloud_upload"/><label for="wordcloud_upload" style="margin-left:3px;">Upload</label><br><input type="checkbox" id="wordcloud_download"/><label for="wordcloud_download" style="margin-left:3px;">Download</label>';
+  }
+  else{
+    html.innerHTML='';
+  }
+});
+// when generate trailer of the creator's dashboard is clicked ----> renders screen-3
+$(document).on('click', '#goNext', function () {
+  
+var html='<center><h2 class="mt-4" font-family: "Langar">  Screen-3  </h2></center> <br><br>';
+html+='<div id="section-1"><div class="flex-container" style="margin-left:25%;"><iframe style="margin:3px 0px;margin-left:10px" src="/trailer_generation/template_2/'+data.view_area.trailer_path+'" alt="Frame" height="250"></iframe><div style="flex-grow:1;margin:10px;margin-left:25px;">Details:';
+html+=('<br>1. '+data.view_area.description_1+'<br>2. '+data.view_area.description_2+'<br><br>');
+html+='<button type="button" id="generate-trailer1" class="btn btn-round btn-outline-primary my-2 my-sm-0">Edit</button></div></div></div><br><br>';
+html+='<center><button type="button" id="attachToPathway" class="btn btn-round btn-outline-primary my-2 my-sm-0">Attach To Pathway</button></center>';
+const container = document.getElementById('tgPage-content');  
+container.innerHTML = html;
+});
+// when edit option of a fram is clicked
+function clickEditFrame(idx){
+   
+var htmlt= '<div class="modal fade" id="editModal" role="dialog"><div class="modal-dialog" ><div class="modal-content"><div class="modal-header"><h4 class="modal-title">Edit Frame</h4><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body">';
+var editables=data.frame_editing_area[idx].editables;
+
+for (let i = 0; i <editables.length; i++) {
+  if(editables[i]=="name_image" || editables[i]=="affiliation_image")
+  {
+    htmlt+=('<p>'+editables[i]+':</p><input type="file" accept="image/*" class="form-control-file" id="'+"edit-"+editables[i]+'"aria-describedby="emailHelp"></input><br>');  
+  }
+  else if(editables[i]=="color_text" || editables[i]=="bold_text"){
+    if(data.frame_editing_area[idx][''+editables[i]+'']=="false"){
+    
+      htmlt+=('<p>'+editables[i]+':<br><input type="radio" id="'+editables[i]+'-true" name="'+editables[i]+'-ans" ><label for="'+editables[i]+'-true">True</label><br><input type="radio" id="'+editables[i]+'-false" name="'+editables[i]+'-ans" checked="checked"><label for="'+editables[i]+'-false">False</label><br>');
+    }
+    else{
+      htmlt+=('<p>'+editables[i]+':<br><input type="radio" id="'+editables[i]+'-true" name="'+editables[i]+'-ans" checked="checked"><label for="'+editables[i]+'-true">True</label><br><input type="radio" id="'+editables[i]+'-false" name="'+editables[i]+'-ans"><label for="'+editables[i]+'-false">False</label><br>');
+ 
+      }
+    }
+  else{
+  htmlt+=('<p>'+editables[i]+':</p><input type="text" class="form-control" id="'+"edit-"+editables[i]+'"aria-describedby="emailHelp" placeholder="Enter '+editables[i]+'" value="'+data.frame_editing_area[idx][editables[i]] +'"></input><br>');
+  }
+}              
+
+htmlt += '<button type="button" id="edit-frame-submit" onClick=\'submitEditFrame('+idx+') \' class="btn btn-round btn-outline-primary my-2 my-sm-0" style="margin-left:40%;padding:10px;" data-dismiss="modal"> Submit</button></div>';             
+htmlt += '<div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button></div></div></div></div>';
+
+const editForm = document.getElementById('edit-frame');
+editForm.innerHTML = htmlt;
+}
+// when submit button of the edit frame is clicked
+function submitEditFrame(idx) {
+  //console.log(data);
+  var editables=data.frame_editing_area[idx].editables;
+  for (let i = 0; i <editables.length; i++) {
+      var change;
+      var x=data.frame_editing_area[idx].editables[i];
+      if(editables[i]=="name_image" || editables[i]=="affiliation_image")
+        {    console.log( JSON.stringify(data.frame_editing_area[idx][editables[i]]));
+        var formdata = new FormData();
+        formdata.append('file', document.getElementById("edit-"+editables[i]).files[0]);
+        formdata.append('destination',JSON.stringify(data.frame_editing_area[idx][editables[i]]));
+          $.ajax
+        ({
+          type: "POST",
+          url: '/learningMaps/trailerGeneration',
+          data: formdata,
+          processData: false,
+          contentType: false,
+          async:false,
+          success:         
+          function (response)
+          {
+            
+          },
+          error: function (jqXhr, textStatus, errorMessage) {
+            console.log(errorMessage);
+          }
+        });
+
+        }
+      else if(editables[i]=="color_text" || editables[i]=="bold_text"){
+            if(document.getElementById(editables[i]+"-true").checked)
+            {
+              data.frame_editing_area[idx][''+x+'']="true";    
+            }
+            else if(document.getElementById(editables[i]+"-false").checked)
+            {
+              data.frame_editing_area[idx][''+x+'']="false";
+            }
+        }
+      else{
+            change=document.getElementById("edit-"+editables[i]).value;
+            data.frame_editing_area[idx][''+x+'']=change;
+            //console.log(data);
+        }
+  }
+}  
+</script>
+    
+</body>

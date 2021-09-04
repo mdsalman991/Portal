@@ -1,0 +1,64 @@
+<div id = "container" class="container-fluid">
+    <div class="row mt-5">
+
+      <div class="col-md-6 m-auto">
+      <center>
+        <div class="card card-body" id="divReplace">
+      <form id="form">
+        <fieldset>
+          <center><p>Step 1 of 2</p></center>
+          <center><legend>Create New Map</legend></center>
+
+          <div class="row" style="margin-left: 120px;">
+            <fieldset class="form-group-inline col-xs-6">
+              <label for="resource-name"></label>
+              <input type="text" class="form-control" id="map-name" aria-describedby="emailHelp" placeholder="Enter name">
+            </fieldset>
+            <fieldset class="form-group-inline col-xs-6">
+              <div class="form-group-inline col-xs-6">
+              <label for="resource-tag"></label>
+              <input type="text" class="form-control" id="map-tag" aria-describedby="emailHelp" style="margin-left: 20px;" placeholder="Enter tags">
+            </div>
+            </fieldset>
+          </div>
+
+          <div class="row" style="margin-left: 120px;">
+            <div class="form-group-inline col-xs-6">
+              <label for="resource-description"></label>
+              <input type="textarea" class="form-control" id="map-description" aria-describedby="emailHelp" style="margin-left: 1px; width: 425px; " placeholder="Enter Description">
+            </div>
+            
+          </div>
+        </br>
+          <button type="button" id="form-submit" class="btn btn-primary">Next</button>
+          <!--<input type='button' value='Submit form' class="btn btn-primary" onClick='submitDetailsForm()' />--> 
+      </form>
+    </div>
+    <div id="customize-form" style="position: absolute;">
+    
+    </div>
+      </center>
+    </div>
+  </div>
+</div>
+
+<script>
+    $('.btn.btn-primary').on('click', function(e){
+          e.preventDefault();
+          //console.log("hi")
+          $.ajax({
+            url: "learningMaps/createMap",
+            type: "get",
+            contentType: "application/json",
+            success: function(response) {
+              //console.log("success");
+              // document.getElementById("container").innerHTML = response;
+              window.location.href = "/createMap";
+            },
+            error: function(xhr){
+               //console.log("in subscribe error");
+            },
+          });
+      });
+</script>
+  

@@ -1,0 +1,149 @@
+<div class="d-flex toggled" id="wrapper">
+  <%- include('./partials/sidebar.ejs') %>
+
+  <!-- Page Content -->
+  <div id="page-content-wrapper">
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <ul class="navbar-nav mr-auto">
+        <button class="btn btn-secondary" id="menu-toggle">
+          <i class="fas fa-bars fa-2x" aria-hidden="true"></i>
+        </button>
+      </ul>
+      <form class="form-inline my-2 my-lg-0 search-form">
+        <input
+          class="form-control mr-lg-2"
+          type="text"
+          id="search-input"
+          placeholder="Search"
+        />
+        <button
+          class="btn btn-round btn-outline-primary my-2 my-sm-0"
+          type="submit"
+        >
+          <i class="fas fa-search" aria-hidden="true"></i>&nbsp;Search
+        </button>
+      </form>
+    </nav>
+
+    <div class="row">
+      <div class="col-2"></div>
+
+      <div class="col-8" id="learningMapCard">
+        <center>
+          <h2 class="mt-4" style="font-family: 'Langar'">My Maps</h2>
+        </center>
+        <% learningMapsList.forEach(function(learningMap) { %> <% var tagString
+        = ""; %> <% for (var i = 0; i < learningMap.mapTags.length; i++){ %> <%
+        if (i > 0){ tagString += ", "; } %> <% tagString +=
+        learningMap.mapTags[i] %> <% } %> <% var userId =
+        JSON.stringify(user._id); %> <% var isSubscribed = false; %> <% var
+        subscribersList = learningMap.userList; %> <% var noOfSubscribers =
+        subscribersList.length %> <% for (var i = 0; i < subscribersList.length;
+        i++){ %> <% if (userId == JSON.stringify(subscribersList[i].userId)){ %>
+        <% isSubscribed = true; %> <% } %> <% } %>
+
+        <div
+          class="card border-dark mb-6"
+          style="
+            max-width: 80rem;
+            max-height: 80rem;
+            margin-top: 20px;
+            margin-bottom: 20px;
+          "
+        >
+          <div class="card-body">
+            <h4 class="card-title" style="margin-bottom: 0.01rem">
+              <%= learningMap.mapName %>
+            </h4>
+            <% if (isSubscribed == true){ %>
+            <button
+              style="border: none; background: none; float: right"
+              disabled
+            >
+              <i class="fas fa-star" aria-hidden="true"
+                >&nbsp;<%= noOfSubscribers %> subscribers</i
+              >
+            </button>
+            <% } else { %>
+            <button
+              id="<%= learningMap._id %>"
+              class="subscriberButton"
+              style="border: none; background: none; float: right"
+            >
+              <i
+                id="subscribeIframe<%= learningMap._id %>"
+                class="far fa-star"
+                aria-hidden="true"
+                >&nbsp;<%= noOfSubscribers %> subscribers</i
+              >
+            </button>
+            <% } %>
+
+            <small class="text-muted" style="margin-bottom: 5rem"
+              ><i class="fas fa-user"></i>&nbsp;<%=
+              learningMap.createdByUsername %></small
+            >
+            <small class="text-muted" style="margin-bottom: 5rem"
+              >&nbsp;&nbsp;<i class="fas fa-clock"></i>&nbsp;<%=
+              learningMap.totalAttentionTime %>&nbsp;mins</small
+            >
+            <small class="text-muted" style="margin-bottom: 5rem"
+              >&nbsp;&nbsp;<i class="fas fa-tags" aria-hidden="true"></i
+              >&nbsp;<%= tagString %></small
+            >
+
+            <% if (learningMap.resourceTypesobject["Text"] > 0){ %>
+            <small class="text-muted" style="margin-bottom: 5rem"
+              >&nbsp;&nbsp;<i class="fas fa-file-alt" aria-hidden="true"></i
+              >Text</small
+            >
+            <% } %> <% if (learningMap.resourceTypesobject["Pdf"] > 0){ %>
+            <small class="text-muted" style="margin-bottom: 5rem"
+              >&nbsp;&nbsp;<i class="fas fa-file-pdf" aria-hidden="true"></i
+              >&nbsp;Pdf</small
+            >
+            <% } %> <% if (learningMap.resourceTypesobject["Video"] > 0){ %>
+            <small class="text-muted" style="margin-bottom: 5rem"
+              >&nbsp;&nbsp;<i class="fas fa-video" aria-hidden="true"></i
+              >Video</small
+            >
+            <% } %>
+
+            <p class="card-text"><%= learningMap.mapDescription %></p>
+            <br /><br />
+
+            <p class="card-text" style="margin-bottom: 0.1rem; float: right">
+              <%= learningMap.noOfResources %> resources in the map
+            </p>
+            <br /><br />
+            <p class="card-text" style="margin-bottom: 0.1rem; float: right">
+              <%= learningMap.noOfPathways %> pathways in the map
+            </p>
+            <form
+              id="form<%= learningMap._id %>"
+              action="/learningMaps/viewMap"
+              method="GET"
+            >
+              <input
+                type="hidden"
+                name="learningMapId"
+                value="<%= learningMap._id %>"
+              />
+              <button
+                id="<%= learningMap._id %>"
+                class="btn btn-round btn-outline-primary my-2 my-sm-0 viewMapButton"
+                type="submit"
+              >
+                View
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <% }); %>
+      </div>
+
+      <div class="col-2"></div>
+    </div>
+  </div>
+</div>

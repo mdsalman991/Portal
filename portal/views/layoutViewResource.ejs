@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossOrigin="anonymous">
+
+    <link
+      rel="stylesheet"
+      href="https://bootswatch.com/4/lux/bootstrap.min.css"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="../css/main.css" />
+     <link href="../css/simple-sidebar.css" rel="stylesheet" crossOrigin="anonymous"/>
+
+    <title>PLE portal</title>
+  </head>
+
+  <style>
+  .modal {
+    overflow-y:auto;
+  }
+  </style>
+
+  <body>
+    <%- include('./partials/header.ejs') %>
+    <%- body %>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossOrigin="anonymous".>
+    <link 
+      href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css" 
+      rel="stylesheet"  type='text/css' crossOrigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfobject/2.2.3/pdfobject.js" integrity="sha512-hSmaFzjzbZ7aJhF3zyq2pwZMy+h3mcytHHM+d2dJWCLwRc8FYAMc1oyckOrtSliQ8j/DW+54PjdRsEkDt6MkTQ==" crossOrigin="anonymous"></script>
+    
+  <!--  <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"       
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossOrigin="anonymous"
+    ></script> -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossOrigin="anonymous"></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+      integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+      crossOrigin="anonymous"
+    ></script>
+    
+
+    <script>
+      var resourceList = <%- JSON.stringify(resourceList) %>
+      var username = <%- JSON.stringify(username) %>
+      var user = <%- JSON.stringify(user) %>
+      var userId=user._id;
+
+      $(".search-form").submit(function(event){
+
+event.preventDefault();
+
+var searchInput = document.getElementById("search-input").value;
+
+searchInput = searchInput.toLowerCase();
+
+var resourceTypeDropdown = document.getElementById("resourceTypeDropdown").value;
+
+var displayHTML = '';
+
+for (var i = 0; i < resourceList.length; i++){
+  
+  var flag = false;
+  var flagType = true;
+
+  var resource = resourceList[i];
+  var resourceName = resource.resourceName;
+  var resourceTags = resource.resourceTags;
+  resourceName = resourceName.toLowerCase();
+  var res = resourceName.match(searchInput);
+ 
+  if (res != null && res.length > 0){
+    flag = true;
+  }
+
+  var tagString = "";
+
+  for (var j = 0; j < resourceTags.length; j++){
+    
+    if (j > 0){ tagString += ", "; }
+    
+    var tagObj = resourceTags[j];
+    var tag = tagObj.tagName;
+    tagString += tag;
+    tag.toLowerCase();
+    res = tag.match(searchInput);
+
+    if (res != null){
+      flag = true;
+      break;
+    }
+
+  }
+
+  var resourceDescription = resource.resourceDescription;
+  res = resourceDescription.match(searchInput);
+
+  if (res != null && res.length > 0){
+    flag = true
+  }
+
+  var resourceId = JSON.stringify(resource._id);
+  var tm = resource.attentionTime;
+  let rsrString = JSON.stringify(resource);
+  
+  if (resourceTypeDropdown === "Pdf" || resourceTypeDropdown === "Video" || resourceTypeDropdown === "Text"){
+    if (resourceTypeDropdown != resource.resourceType){
+      flagType = false
+    }
+  }
+  
+  var rsrTypeIcon;
+  
+  if (resource.resourceType === 'Text'){
+    rsrTypeIcon='<small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-file-alt" aria-hidden="true"></i>Text</small>';
+  }
+
+  if (resource.resourceType === 'Pdf'){
+    rsrTypeIcon='<small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-file-pdf" aria-hidden="true"></i>&nbsp;Pdf</small>';
+  }
+
+  if (resource.resourceType === 'Video'){
+    rsrTypeIcon='<small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-video" aria-hidden="true"></i>Video</small>';
+  }
+  
+    var likesList = resource.likedBy;
+    var dislikesList = resource.dislikedBy;
+    var noOfLikes = likesList.length;
+    var noOfDislikes = dislikesList.length;
+    var completedList = resource.completedBy;
+
+    var thumbsUpIcon = '<button style="border: none; background: none;" onclick=\'clickLike('+ rsrString +','+ noOfLikes + ','+ 0 +' ) \'><i id="' + resource._id +'" class="far fa-thumbs-up" aria-hidden="true">&nbsp;'+ noOfLikes +'</i></button>';
+    
+    for (var k = 0; k < likesList.length; k++){
+        
+        if (JSON.stringify(likesList[k]) === JSON.stringify(userId)){
+          thumbsUpIcon = '<button style="border: none; background: none;" onclick=\'clickLike('+ rsrString +','+ noOfLikes + ','+ 1 + ' ) \'><i id="' + resource._id +'" class="fas fa-thumbs-up" aria-hidden="true">&nbsp;'+ noOfLikes +'</i></button>';
+          break;
+          }
+        }
+
+    var thumbsDownIcon = '<button style="border: none; background: none;" onclick=\'clickDislike('+ rsrString +','+ noOfDislikes + ','+ 0 + ' ) \'><i id="dislike' + resource._id +'" class="far fa-thumbs-down" aria-hidden="true">&nbsp;'+ noOfDislikes +'</i></button>';
+
+    for (var k = 0; k < dislikesList.length; k++){
+        if (JSON.stringify(dislikesList[k]) === JSON.stringify(userId)){
+          thumbsDownIcon = '<button style="border: none; background: none;" onclick=\'clickDislike('+ rsrString +','+ noOfDislikes + ','+ 1 + ' ) \'><i id="dislike' + resource._id +'" class="fas fa-thumbs-down" aria-hidden="true">&nbsp;'+ noOfDislikes +'</i></button>';
+          break;
+          }
+        }
+
+    var completedIcon = '<button id="btnCompleted' + resource._id +'" style="border: none; background: none;" onclick=\'clickCompleted('+ rsrString +' ) \'><i id="completed' + resource._id +'" class="far fa-check-circle" aria-hidden="true">&nbsp;completed?</i></button>';
+
+    for (var k = 0; k < completedList.length; k++){
+        if (JSON.stringify(completedList[k]) === JSON.stringify(userId)){
+          completedIcon = '<button id="btnCompleted' + resource._id +'" style="border: none; background: none;" onclick=\'clickCompleted('+ rsrString +' ) \' disabled><i id="completed' + resource._id +'" class="fas fa-check-circle" aria-hidden="true">&nbsp;completed</i></button>';
+          }
+      }
+    
+    var deleteIcon='<button class="btn btn-round btn-outline-primary my-2 my-sm-0" id="delete'+resource._id+'" onclick= \'clickDelete('+ rsrString +' ) \'>Delete</button>' 
+      
+    if (JSON.stringify(resource.uploadedBy) != JSON.stringify(userId)){deleteIcon='';} 
+    
+    var editIcon='<button data-toggle="modal" data-target="#myModal3" class="btn btn-round btn-outline-primary my-2 my-sm-0" id="edit'+resource._id+'" onclick= \'clickEdit('+ rsrString +' ) \'>Edit</button>' 
+        
+    if (JSON.stringify(resource.uploadedBy) != JSON.stringify(userId)){editIcon='';} 
+
+    if (flag === true && flagType === true){
+              displayHTML += '<div class="card border-dark mb-6" style="max-width: 80rem; max-height: 80rem; margin-top:20px; margin-bottom: 20px;"><div class="card-body"><h4 class="card-title" style="margin-bottom:0.01rem;">'+ resource.resourceName + '</h4><small class="text-muted" style="margin-bottom: 5rem;"><i class="fas fa-user"></i>&nbsp;' + username + '</small><small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-clock"></i>&nbsp;'+ tm + '&nbsp;mins</small><small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-tags" aria-hidden="true"></i>&nbsp;'+ tagString +'</small>' + rsrTypeIcon +thumbsUpIcon+thumbsDownIcon+completedIcon+ '&nbsp<p class="card-text">' + resource.resourceDescription +'</p><br/><br/><button id="' + resource._id + '" class="btn btn-round btn-outline-primary my-2 my-sm-0 renderFile" type="submit">View</button>&nbsp;'+deleteIcon+'&nbsp;'+editIcon+'</div></div>';
+    }
+  
+}
+
+document.getElementById("resourceGroupCard").innerHTML = displayHTML;
+
+});
+
+      function add_notification(msg)
+    {
+      $.ajax
+        ({
+          type: 'POST',  // http method
+          url: '/resources/addnotification',
+          data: {message:msg},
+          success:         
+          function (data, status, xhr)
+          {
+            console.log("Added");
+          },       
+
+          error: function (jqXhr, textStatus, errorMessage)
+          {
+            console.log("Can't add ");
+          }            
+        });
+    }
+
+    function showUploaded(msg)
+    {
+      $('#notify_msg').text(msg);
+      $('.alert').addClass("show");
+      $('.alert').removeClass("hide");
+      $('.alert').addClass("showAlert");
+    
+      setTimeout(function()
+      {
+        $('.alert').removeClass("show");
+        $('.alert').addClass("hide");
+      },5000);
+
+      $('.close-btn').click(function()
+      {
+        $('.alert').removeClass("show");
+        $('.alert').addClass("hide");
+      });
+    }
+      $(document).ready(function () { 
+        $("#wrapper").toggleClass("toggled");
+      });
+
+      $(".notifications .icon_wrap").click(function()
+      {
+        $(this).parent().toggleClass("active");		
+        $.ajax
+            ({
+                  url: "/resources/notification",
+                  type: "get", //send it through get method
+                  contentType: "application/json",
+
+                  success: function(response)
+                  {              
+                    var lis = document.getElementById("Notification_ALL");
+                    lis_length = lis.children.length;
+                    for (let i = 0; i < lis_length; i++)
+                    {
+                      lis.removeChild(lis.children[0]);
+                    }
+                    console.log(lis.children.length);
+
+                    response.noti.forEach(element => 
+                    { 
+                      var li = document.createElement("li");
+                      var inputValue = element.message;
+                      var t = document.createTextNode(inputValue);
+                      li.appendChild(t);
+                      lis.appendChild(li);
+                    });
+                  },
+                  error: function(xhr){
+                    console.log("Add Error!");
+                  }
+            });
+      });
+
+      $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+        
+      });
+
+      $("#map-drop").click((e) => {
+        const dropdown = document.getElementsByClassName("map-drop-item");
+        Array.from(dropdown).forEach(item => {
+          if (item.style.display === "block") {
+            item.style.display = "none";
+          } else {
+            item.style.display = "block";
+          }
+        }); 
+      });
+
+      $("#resource-drop").click((e) => {
+        const dropdown = document.getElementsByClassName("resource-drop-item");
+        Array.from(dropdown).forEach(item => {
+          if (item.style.display === "block") {
+            item.style.display = "none";
+          } else {
+            item.style.display = "block";
+          }
+        });
+      });
+
+      $('#resourceGroupCard').on('click', 'button.renderFile', function(e){
+          e.preventDefault();
+          var resourceId = this.id;
+
+          var txtModal = "";
+
+          for (var i = 0; i < resourceList.length; i++){
+            let resourceObj = resourceList[i];
+            let resourceObjId = resourceObj._id;
+
+            if (resourceId === resourceObjId){
+              var location = resourceObj.resourceLocation.originalLocation;
+              var locationList = location.split('/');
+              var originalName = locationList[locationList.length - 1];
+              
+              txtModal = '<div class="modal fade" id="txtModal" data-backdrop="static" data-keyboard="false"><div class="modal-dialog" role="document" style="max-width: 100%; margin-left: 150px; margin-right: 150px;"><div class="modal-content"><div class="modal-header"><button type="button" class="close" onclick="onClose()" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body"><iframe src="../datastore/raw/'+ originalName +'" width="100%" height="750px;" style="overflow: auto;"></iframe></div><div class="modal-footer"><button type="button" class="btn btn-secondary" onclick="onClose()" data-dismiss="modal">Close</button></div></div></div></div>';
+              break;
+            }
+            
+          }
+
+          const divTxtModal = document.getElementById('divTxtModal');    
+          divTxtModal.innerHTML = txtModal;
+
+          $('#txtModal').modal('show');
+      });
+
+      function onClose()
+       { 
+    $("#txtModal iframe").attr("src", "");
+       };
+
+       function clickLike(resource, noOfLikes, flag){
+          
+          var id = resource._id;
+          var elementThumbs = document.getElementById(id);
+          var thumbsClassString = $(elementThumbs).attr('class');
+          var thumbsClassList = thumbsClassString.split(' ');
+          var thumbsClass = thumbsClassList[0];
+        
+
+          if (thumbsClass === "far"){
+            $.ajax({
+              url: "/resources/updateLikes",
+              type: "get", 
+              contentType: "application/json",
+              data: { 
+                resource: resource._id,
+                action: "like", 
+              },
+              success: function(response) {
+                $(elementThumbs).attr('class', 'fas fa-thumbs-up');
+                noOfLikes += 1;
+                document.getElementById(id).innerHTML = '&nbsp;' + response.noOfLikes;
+              },
+              error: function(xhr){}
+            
+            });
+
+          }
+          else {
+
+            $.ajax({
+              url: "/resources/updateLikes",
+              type: "get", 
+              contentType: "application/json",
+              data: { 
+                resource: resource._id,
+                action: "unlike", 
+              },
+              success: function(response) {
+                $(elementThumbs).attr('class', 'far fa-thumbs-up');
+                document.getElementById(id).innerHTML = '&nbsp;' + response.noOfLikes;
+              },
+              error: function(xhr){}
+            });
+
+          }
+        }
+
+      function clickDislike(resource, noOfDislikes, flag){
+        
+        var id = 'dislike' + resource._id;
+        var elementThumbs = document.getElementById(id);
+        var thumbsClassString = $(elementThumbs).attr('class');
+        var thumbsClassList = thumbsClassString.split(' ');
+        var thumbsClass = thumbsClassList[0];
+        
+
+        if (thumbsClass === "far"){
+
+          $.ajax({
+            url: "/resources/updateDislikes",
+            type: "get",
+            contentType: "application/json",
+            data: { 
+              resource: resource._id,
+              action: "dislike", 
+            },
+            success: function(response) {
+              
+              $(elementThumbs).attr('class', 'fas fa-thumbs-down');
+              noOfDislikes += 1;
+              document.getElementById(id).innerHTML = '&nbsp;' + response.noOfDislikes;
+            },
+            error: function(xhr){}
+          });
+
+        }
+        else {
+
+          $.ajax({
+            url: "/resources/updateDislikes",
+            type: "get",
+            contentType: "application/json",
+            data: { 
+              resource: resource._id,
+              action: "undislike", 
+            },
+            success: function(response) {
+              $(elementThumbs).attr('class', 'far fa-thumbs-down');
+              document.getElementById(id).innerHTML = '&nbsp;' + response.noOfDislikes;
+            },
+            error: function(xhr){}
+          });
+
+        }
+
+
+      }
+
+      function clickCompleted(resource){
+
+        var id = 'completed' + resource._id;
+        var buttonId = 'btnCompleted' + resource._id;
+        var elementCompleted = document.getElementById(id);
+
+        $.ajax({
+            url: "/resources/updateCompleted",
+            type: "get", 
+            contentType: "application/json",
+            data: { 
+              resource: resource._id,
+            },
+            success: function(response) {
+              $(elementCompleted).attr('class', 'fas fa-check-circle');
+              document.getElementById(id).innerHTML = '&nbsp;completed';
+              document.getElementById(buttonId).disabled = true;
+            },
+            error: function(xhr){}
+          });
+      }
+      
+      function clickDelete(resource){
+          $.ajax({
+              url: "/resources/deleteResource",
+              type: "get", //send it through get method
+              contentType: "application/json",
+              data: { 
+                resource: resource._id,
+              },
+              success: function(response) {
+                   history.go(0);
+              },
+              error: function(xhr){
+              
+              }
+            });
+          }
+
+          function clickEdit(resource){
+             
+             var tagString = ""; 
+             
+             for (var i = 0; i < resource.resourceTags.length; i++){ 
+                if (i > 0){ tagString += ", "; } 
+                tagString += resource.resourceTags[i].tagName 
+             } 
+             let rsrId = JSON.stringify(resource._id);
+             var htmlt= '<div class="modal fade" id="myModal3" role="dialog"><div class="modal-dialog" ><div class="modal-content"><div class="modal-header"><h4 class="modal-title"></h4><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body">'
+             
+             htmlt+= '<h3>Edit Resource Information</h3><p>Resource Name:</p><input type="text" class="form-control" id="edit-resource-name" aria-describedby="emailHelp" placeholder="Enter Resource Name" value='+resource.resourceName+'></input><p>Resource Tags:</p><input type="text" class="form-control" id="edit-resource-tag" aria-describedby="emailHelp" placeholder="Enter Resource Tags" value='+tagString+'></input><p>Resource Description:</p><input type="text" class="form-control" id="edit-resource-description" aria-describedby="emailHelp" placeholder="Enter Resource Description" value='+resource.resourceDescription+'></input>';
+             
+             htmlt += '<button type="button" id="edit-submit" onclick=editSubmit('+rsrId+') class="btn btn-primary" style="margin-left:40%" > Submit</button></div>';
+             
+             htmlt += '<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div>';
+             
+             const editForm = document.getElementById('edit-form');
+             
+             editForm.innerHTML = htmlt;               
+        }
+
+      function editSubmit(resourceID) {
+            
+            var formdata = new FormData();
+            var editedResourceName=document.getElementById("edit-resource-name");
+            var editedResourceDescription=document.getElementById("edit-resource-description");
+            var editedResourceTags=document.getElementById("edit-resource-tag");
+            formdata.append('resourceID', resourceID); 
+            formdata.append('editedResourceName', editedResourceName.value);
+            formdata.append('editedResourceDescription', editedResourceDescription.value);
+            formdata.append('editedResourceTags', editedResourceTags.value);
+
+            $.ajax({
+                type: 'POST',  
+                url: '/resources/editResource',
+                data: formdata,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+
+                success: function (data, status, xhr) {
+                  $('#myModal3').modal('hide');
+                  history.go(0);
+                },
+                error: function (jqXhr, textStatus, errorMessage) {}
+              });
+        }    
+
+
+    </script>
+
+  </body>
+</html>

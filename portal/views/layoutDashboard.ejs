@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+    integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://bootswatch.com/4/lux/bootstrap.min.css" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link href="../css/simple-sidebar.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Langar&display=swap" rel="stylesheet">
+  <title>PLE portal</title>
+</head>
+
+<body>
+  <%- include('./partials/header.ejs') %>
+  <%- body %>
+  <%- include('./partials/footer.ejs') %>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+    integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+    integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+  <script>
+
+    $("#menu-toggle").click(function (e) {
+      e.preventDefault();
+      $("#wrapper").toggleClass("toggled");
+
+    });
+
+    $(".notifications .icon_wrap").click(function()
+    {
+      $(this).parent().toggleClass("active");		
+      $.ajax
+      ({
+            url: "/resources/notification",
+            type: "get", //send it through get method
+            contentType: "application/json",
+
+            success: function(response)
+            {              
+              var lis = document.getElementById("Notification_ALL");
+              lis_length = lis.children.length;
+              for (let i = 0; i < lis_length; i++)
+              {
+                lis.removeChild(lis.children[0]);
+              }
+              console.log(lis.children.length);
+
+              response.noti.forEach(element => 
+              { 
+                var li = document.createElement("li");
+                var inputValue = element.message;
+                var t = document.createTextNode(inputValue);
+                li.appendChild(t);
+                lis.appendChild(li);
+              });
+            },
+            error: function(xhr){
+              console.log("Add Error!");
+            }
+      });
+    });
+
+    $("#map-drop").click((e) => {
+      const dropdown = document.getElementsByClassName("map-drop-item");
+      Array.from(dropdown).forEach(item => {
+        if (item.style.display === "block") {
+          item.style.display = "none";
+        } else {
+          item.style.display = "block";
+        }
+      });
+    });
+
+    $("#resource-drop").click((e) => {
+      const dropdown = document.getElementsByClassName("resource-drop-item");
+      Array.from(dropdown).forEach(item => {
+        if (item.style.display === "block") {
+          item.style.display = "none";
+        } else {
+          item.style.display = "block";
+        }
+      });
+    });
+  </script>
+
+</body>
+
+</html>

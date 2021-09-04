@@ -1,0 +1,34 @@
+<% resourceList.forEach(function(resource) { %>
+  <% let rsrString = JSON.stringify(resource); %>
+  <% var tagString = ""; %>
+  <% for (var i = 0; i < resource.resourceTags.length; i++){ %>
+  <%  if (i > 0){ tagString += ", "; } %>
+  <% tagString += resource.resourceTags[i].tagName %>
+  <% } %>
+
+  <% if (resource.resourceType === 'Text'){ %>
+  <%  rsrTypeIcon='<small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-file-alt" aria-hidden="true"></i>Text</small>'; %>
+  <% } %>
+
+  <% if (resource.resourceType === 'Pdf'){ %>
+  <%  rsrTypeIcon='<small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-file-pdf" aria-hidden="true"></i>&nbsp;Pdf</small>'; %>
+  <% } %>
+
+  <% if (resource.resourceType === 'Video'){ %>
+  <%  rsrTypeIcon='<small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-video" aria-hidden="true"></i>Video</small>'; %>
+  <% } %>
+  <div class="card border-dark mb-6" style="max-width: 60rem; margin-top:20px; margin-bottom: 20px;">
+    <div class="card-body">
+      <h6 class="card-title" style="margin-bottom:0.01rem;"><%= resource.resourceName %></h6>
+      <small class="text-muted" style="margin-bottom: 5rem;"><i class="fas fa-user"></i>&nbsp;<%= resource.uploadedBy %></small>
+      <small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-clock"></i>&nbsp;<%= resource.attentionTime %>&nbsp;mins</small>
+      <small class="text-muted" style="margin-bottom: 5rem;">&nbsp;&nbsp;<i class="fas fa-tags" aria-hidden="true"></i>&nbsp;<%= tagString %></small>
+      <%- rsrTypeIcon %>
+      <p class="card-text"><%= resource.resourceDescription %></p>
+      <br/><br/>
+      
+      <button id="<%= resource._id %>" class="btn btn-round btn-outline-primary my-2 my-sm-0 renderFile" type="submit" >View</button>
+      <a class="btn btn-round btn-outline-primary my-2 my-sm-0" href="/discussions/r/<%= resource._id %>">Discussions</a>
+    </div>
+  </div>
+<% }); %>

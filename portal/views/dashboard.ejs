@@ -1,0 +1,68 @@
+<div class="d-flex" id="wrapper">
+  <%- include('./partials/sidebar.ejs') %>
+  <!-- Page Content -->
+  <div id="page-content-wrapper">
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <button class="btn btn-secondary" id="menu-toggle"><i class="fas fa-bars fa-2x" aria-hidden="true"></i></button>
+    </nav>
+
+    <div class="container-fluid">
+      <center><h2 class="mt-4" style="font-family: 'Langar';">User Dashboard</h2></center>
+      <div class="row ">
+        <div class="col-md-2"></div>
+        <div class="col-md-4">
+          <div style="padding-top: 10px; border: 1px; border-style: solid; height: 320px; margin: 10px;">
+            <center>
+              <h2 class="mt-4" style="font-family: 'Langar';">All Maps</h2>
+            </center>
+            <br /><br />
+            <center><i class="fas fa-chart-line fa-5x"></i></center>
+            <br />
+            <center><a href="/learningMaps/viewAllMaps" class="btn btn-round btn-outline-primary my-2 my-sm-0">All Maps</a></center>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div style="padding-top: 10px; border: 1px; border-style: solid; height: 320px; margin: 10px;">
+            <center>
+              <h2 class="mt-4" style="font-family: 'Langar';">My Maps</h2>
+            </center>
+            <br /><br />
+            <center><i class="fas fa-star fa-5x" aria-hidden="true"></i></center>
+            <br />
+            <center><a href="/learningMaps/viewMyMaps" class="btn btn-round btn-outline-primary my-2 my-sm-0">My Maps</a></center>
+          </div>
+        </div>
+        <div class="col-md-2"></div>
+      </div>
+      <div class="row ">
+        <div class="col-md-2"></div>
+        <div class="col-md-4">
+          <div style="padding-top: 10px; border: 1px; border-style: solid; height: 320px; margin: 10px;">
+            <center>
+              <h2 class="mt-4" style="font-family: 'Langar';">All Resources</h2>
+            </center>
+            <br /><br />
+            <center><i class="fas fa-book fa-5x"></i></center>
+            <br />
+            <center><a href="/resources/viewResource" class="btn btn-round btn-outline-primary my-2 my-sm-0">Resource Repository</a></center>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div style="padding-top: 10px; border: 1px; border-style: solid; height: 320px; margin: 10px;">
+            <center>
+              <h2 class="mt-4" style="font-family: 'Langar';">Resource Collections</h2>
+            </center>
+            <br /><br />
+            <center><i class="fas fa-folder fa-5x" aria-hidden="true"></i></center>
+            <br />
+            <center><a href="/resources/viewResourceGroup" class="btn btn-round btn-outline-primary my-2 my-sm-0">Resource
+                Collections</a></center>
+          </div>
+        </div>
+        <div class="col-md-2"></div>
+      </div>
+    </div>
+  </div>
+  <!-- /#page-content-wrapper -->
+</div>
+<!-- /#wrapper -->

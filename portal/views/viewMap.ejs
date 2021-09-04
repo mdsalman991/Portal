@@ -1,0 +1,591 @@
+<!-- This is part of data visualization by Swastik (GitHub: swax06)-->
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v3.min.js"></script>
+
+<script>
+  d3v3 = d3
+  window.d3 = null
+  var topics = <%- topic %>, mapId=<%-mapId%>, pathData = <%- pathData %>, resData = <%- resData %>, uname = <%- JSON.stringify(username) %>;
+  var resourceList, markedResourceList, username, user, mapName = <%- JSON.stringify(name) %>;
+</script>
+
+<script src="https://d3js.org/d3.v5.min.js"></script>
+
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+
+<!-- Color Scale -->
+<script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
+
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+  integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+  crossorigin="anonymous"
+></script>
+
+<link
+  rel="stylesheet"
+  href="https://bootswatch.com/4/lux/bootstrap.min.css"
+  crossorigin="anonymous"
+/>
+
+<script src="../scripts/cloud.js"></script>
+
+<div style="padding-left: 85px">
+  <div class="row">
+    <div class="ui checkbox path" style="padding-top: 10px">
+      <input type="checkbox" />
+      <label>Paths</label>
+    </div>
+    <div
+      class="ui checkbox plabels"
+      style="padding-left: 20px; padding-top: 10px; padding-right: 20px"
+    >
+      <input type="checkbox" />
+      <label>Path Labels</label>
+    </div>
+
+    <div
+      style="
+        width: max-content;
+        height: max-content;
+        border: 1px solid #e0e1e2;
+        border-radius: 4px;
+        background: #e0e1e2;
+      "
+    >
+      <div class="ui button reset">Reset</div>
+      <div
+        class="ui multiple search selection dropdown"
+        style="
+          padding-top: 5px;
+          padding-bottom: 3px;
+          padding-left: 20px;
+          max-width: 1100px;
+          min-width: 400px;
+        "
+      >
+        <i class="dropdown icon"></i>
+        <div class="default text">Select Pathways</div>
+        <div class="menu"></div>
+      </div>
+    </div>
+    <div
+      class="ui"
+      style="padding-left: 20px; padding-right: 20px"
+      onclick="fetchResourcesLog();fetchUserPosition();"
+    >
+      <button class="ui icon button" id="refreshButton">
+        <i class="redo icon"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="ui grid" style="padding-left: 50px">
+  <div class="two column row">
+    <div class="ten wide column">
+      <div id="dataviz"></div>
+    </div>
+    <div class="six wide column">
+      <button class="ui icon button" id="cloudSideBarButton" title="Click me!">
+        <i class="angle double right icon"></i>
+      </button>
+      <div id="cloudSideBar">
+        <div class="ui pointing menu">
+          <a class="item active" data-tab="first">Word Cloud</a>
+          <a class="item" data-tab="second">Resource List</a>
+          <a class="item" data-tab="third">Marked Resource</a>
+          <a class="item" data-tab="fourth">Map info</a>
+        </div>
+        <div
+          class="ui bottom attached tab segment active"
+          style="text-align: center; min-height: 650px"
+          data-tab="first"
+        >
+          <div id="word_cloud"></div>
+        </div>
+
+        <div
+          class="ui bottom attached tab segment"
+          data-tab="second"
+          style="
+            max-height: 650px;
+            overflow-y: auto;
+            min-height: 650px;
+            overflow-x: hidden;
+          "
+        >
+          <div class="row" style="padding-left: 70px">
+            <h5 id="listTitle" style="padding-top: 7px">
+              Select a Resource or a Path
+            </h5>
+          </div>
+          <div class="row">
+            <div class="col-1"></div>
+
+            <div class="col-10" id="resourceCards">
+              <!-- <h4 id="listTitle" style="margin-bottom:0.01rem;">Select a Path or a Resource</h4> -->
+              <% for(var i = 0; i < 3; i++){ %>
+              <div
+                class="card border-dark mb-6"
+                style="max-width: 60rem; margin-top: 10px; margin-bottom: 10px"
+              >
+                <div class="card-body">
+                  <div class="ui placeholder">
+                    <div class="medium line"></div>
+                    <div class="short line"></div>
+                    <div class="short line"></div>
+                  </div>
+                  <br /><br />
+                  <div class="ui placeholder">
+                    <!-- <div class="short line"></div> -->
+                    <div class="short line"></div>
+                  </div>
+                </div>
+              </div>
+              <%}%>
+            </div>
+          </div>
+
+          <div class="col-1"></div>
+        </div>
+
+        <div
+          class="ui bottom attached tab segment"
+          data-tab="third"
+          style="
+            max-height: 650px;
+            overflow-y: auto;
+            min-height: 650px;
+            overflow-x: hidden;
+          "
+        >
+          <div class="row" style="padding-left: 30px">
+            <h5 style="padding-top: 7px">
+              Double Click Resource to Mark/Unmark it
+            </h5>
+            <div style="padding-left: 20px">
+              <div class="ui button clear">Clear</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-1"></div>
+
+            <div class="col-10" id="markedResources"></div>
+          </div>
+
+          <div class="col-1"></div>
+        </div>
+
+        <div
+          class="ui bottom attached tab segment"
+          data-tab="fourth"
+          style="max-height: 650px; overflow: auto; min-height: 650px"
+        >
+          <h4 style="padding: 10px">Map Description</h4>
+          <p style="padding: 10px; font-size: 110%"><%=description%></p>
+          <hr />
+          <h4 style="padding: 10px 10px 0px 10px">Legend</h4>
+          <br />
+          <div style="padding: 0px 10px; font-size: 110%">
+            <p>
+              Resources are represented on the map using the type of the
+              resource
+            </p>
+            <img src="/images/map_images/youtube.png" style="width: 20px" />
+            → Video &nbsp; &nbsp; &nbsp;
+            <img src="/images/map_images/txt-file.png" style="width: 20px" />
+            → Text &nbsp; &nbsp; &nbsp;
+            <img src="/images/map_images/pdf-file.png" style="width: 20px" />
+            → PDF
+          </div>
+          <br />
+          <div style="padding: 0px 10px; font-size: 110%">
+            Traffic over a resource is represented using a heatmap around the
+            resource. Larger the circle and brighter the color means more is the
+            traffic.
+          </div>
+          <br />
+          <div style="padding: 0px 10px; font-size: 110%">
+            <p>A user's location is represented using user icons.</p>
+            <img
+              src="/images/map_images/other-user.png"
+              style="width: 20px; opacity: 0.25"
+            />
+            → Other users &nbsp; &nbsp; &nbsp;
+            <img
+              src="/images/map_images/current-user.png"
+              style="width: 20px"
+            />
+            → This is you!
+          </div>
+          <br />
+          <div style="padding: 0px 10px; font-size: 110%">
+            Click on the
+            <button class="ui icon button" onClick="">
+              <i class="redo icon"></i>
+            </button>
+            button to update the map!
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="divModal" style="overflow-y: auto"></div>
+<div
+  id="divTxtModal"
+  style="overflow-y: auto; opacity: 1; padding-top: 20px"
+></div>
+
+<script>
+  let isCloudSideBarOpen = true;
+  const cloudSideBarOnClick = (e) => {
+    if (isCloudSideBarOpen) {
+      isCloudSideBarOpen = false;
+
+      $("#dataviz").parent().attr("class", "fifteen wide column");
+      $("#cloudSideBar").parent().attr("class", "one wide column");
+      $("#cloudSideBar").hide(100);
+      $("#cloudSideBarButton i").attr("class", "angle double left icon");
+      let newMapWidth = $("#dataviz").width();
+      d3.select("#dataviz svg").attr("width", newMapWidth);
+      clip.attr("width", newMapWidth);
+      gElem.attr("width", newMapWidth);
+      gElem.select("rect").attr("width", newMapWidth);
+      x.range([0, newMapWidth]);
+      resetOnClick();
+    } else {
+      isCloudSideBarOpen = true;
+      $("#dataviz").parent().attr("class", "ten wide column");
+      $("#cloudSideBar").parent().attr("class", "six wide column");
+      $("#cloudSideBar").show(100);
+      $("#cloudSideBarButton i").attr("class", "angle double right icon");
+      let newMapWidth = $("#dataviz").width();
+      d3.select("#dataviz svg").attr("width", newMapWidth);
+      clip.attr("width", newMapWidth);
+      gElem.attr("width", newMapWidth);
+      gElem.select("rect").attr("width", newMapWidth);
+      x.range([0, newMapWidth]);
+      resetOnClick();
+    }
+  };
+  $("#cloudSideBarButton").on("click", cloudSideBarOnClick);
+</script>
+
+<script src="../scripts/map.js"></script>
+<script src="../scripts/clickBubble.js"></script>
+<script src="../scripts/userPosition.js"></script>
+<link href="../css/simple-sidebar.css" rel="stylesheet" />
+
+<script>
+  $("#resourceCards").on("click", "button.renderFile", function (e) {
+    e.preventDefault();
+    var resourceId = this.id;
+
+    var txtModal = "";
+
+    for (var i = 0; i < resourceList.length; i++) {
+      let resourceObj = resourceList[i];
+      let resourceObjId = resourceObj._id;
+
+      if (resourceId === resourceObjId) {
+        var location = resourceObj.resourceLocation.originalLocation;
+        var locationList = location.split("/");
+        var originalName = locationList[locationList.length - 1];
+
+        txtModal =
+          '<div class="modal fade" id="txtModal"><div class="modal-dialog" role="document" style="max-width: 100%; margin-left: 150px; margin-right: 150px;"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body"><iframe src="../datastore/raw/' +
+          originalName +
+          '" width="100%" height="750px;" style="overflow: auto;"></iframe></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button></div></div></div></div>';
+
+        break;
+      }
+    }
+
+    const divTxtModal = document.getElementById("divTxtModal");
+    divTxtModal.innerHTML = txtModal;
+    $("#txtModal").modal("show").css({ opacity: "1", "padding-top": "50px" });
+  });
+
+  $("#markedResources").on("click", "button.renderFile", function (e) {
+    e.preventDefault();
+    var resourceId = this.id;
+
+    var txtModal = "";
+
+    for (var i = 0; i < markedResourceList.length; i++) {
+      let resourceObj = markedResourceList[i];
+      let resourceObjId = resourceObj._id;
+
+      if (resourceId === resourceObjId) {
+        var location = resourceObj.resourceLocation.originalLocation;
+        var locationList = location.split("/");
+        var originalName = locationList[locationList.length - 1];
+
+        txtModal =
+          '<div class="modal fade" id="txtModal"><div class="modal-dialog" role="document" style="max-width: 100%; margin-left: 150px; margin-right: 150px;"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body"><iframe src="../datastore/raw/' +
+          originalName +
+          '" width="100%" height="750px;" style="overflow: auto;"></iframe></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button></div></div></div></div>';
+
+        break;
+      }
+    }
+
+    const divTxtModal = document.getElementById("divTxtModal");
+    divTxtModal.innerHTML = txtModal;
+    $("#txtModal").modal("show").css({ opacity: "1", "padding-top": "50px" });
+  });
+  var userId;
+  function myFunc(resourceGroupId) {
+    userId = user._id;
+    let resourceGroupListObj = [];
+    let resourceListObj = [];
+
+    for (var i = 0; i < resourceGroupList.length; i++) {
+      let rsrObj = resourceGroupList[i];
+      if (rsrObj._id == resourceGroupId) {
+        resourcesList = rsrObj.resources;
+        break;
+      }
+      resourceGroupListObj.push(rsrObj);
+    }
+
+    for (var i = 0; i < resourceList.length; i++) {
+      let rsrObj = resourceList[i];
+      resourceListObj.push(rsrObj);
+    }
+
+    let htmlModal =
+      '<div class="modal fade" id="myModal"><div class="modal-dialog" role="document" style="max-width: 100%; margin-left: 150px; margin-right: 150px;"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Modal title</h5><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="false">&times;</span></button></div><div class="modal-body"><table class="table table-hover customize-table"><thead><tr><th scope="col">Document Name</th><th scope="col">Read/View Time</th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th></tr></thead><tbody>';
+
+    let f = 1;
+    for (let j = 0; j < resourcesList.length; j++) {
+      let rsrObj = resourcesList[j];
+      let rsrId = rsrObj.resourceId;
+
+      for (let i = 0; i < resourceListObj.length; i++) {
+        if (rsrId == resourceListObj[i]._id) {
+          let rsr = JSON.stringify(resourceListObj[i]);
+
+          let rsrString = JSON.stringify(resourceListObj[i]);
+          rsr = JSON.parse(rsr);
+
+          var likesList = rsr.likedBy;
+          var dislikesList = rsr.dislikedBy;
+          var completedList = rsr.completedBy;
+
+          var noOfLikes = likesList.length;
+          var noOfDislikes = dislikesList.length;
+
+          var rsrTypeIcon;
+
+          if (rsr.resourceType === "Pdf") {
+            rsrTypeIcon = '<i class="fas fa-file-pdf" aria-hidden="true"/></i>';
+          } else if (rsr.resourceType === "Text") {
+            rsrTypeIcon = '<i class="fas fa-file-alt" aria-hidden="true"></i>';
+          } else {
+            rsrTypeIcon = '<i class="fas fa-video" aria-hidden="true"></i>';
+          }
+          var row =
+            '<tr><th scope="row">' +
+            rsrTypeIcon +
+            "&nbsp;" +
+            rsr.resourceName +
+            "</th><td>" +
+            rsr.attentionTime +
+            ' mins</td><td><button type="button" style="border: none;" class="btn btn-outline-primary" onclick=\'renderFile(' +
+            rsrString +
+            " ) '>View</button></td><td>" +
+            thumbsUpIcon +
+            "</td><td>" +
+            thumbsDownIcon +
+            "</td><td>" +
+            completedIcon +
+            "</td></tr>";
+
+          htmlModal += row;
+
+          break;
+        }
+      }
+    }
+
+    htmlModal +=
+      '</tbody></table></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button></div></div></div></div>';
+
+    const divModal = document.getElementById("divModal");
+    divModal.innerHTML = htmlModal;
+    $("#myModal").modal("show");
+  }
+
+  function clickLike(resource, noOfLikes, flag) {
+    var id = resource._id;
+
+    var elementThumbs = document.getElementById(id);
+    var thumbsClassString = $(elementThumbs).attr("class");
+    var thumbsClassList = thumbsClassString.split(" ");
+    var thumbsClass = thumbsClassList[1];
+
+    if (thumbsClass === "far") {
+      $.ajax({
+        url: "/resources/updateLikes",
+        type: "get", //send it through get method
+        contentType: "application/json",
+        data: {
+          resource: resource._id,
+          action: "like",
+        },
+        success: function (response) {
+          $(elementThumbs).attr("class", "fas fa-thumbs-up");
+          noOfLikes += 1;
+          document.getElementById(id).innerHTML = "&nbsp;" + noOfLikes;
+        },
+        error: function (xhr) {
+          console.log("in like error");
+        },
+      });
+    } else {
+      //console.log("thms: ", thumbsClass);
+
+      $.ajax({
+        url: "/resources/updateLikes",
+        type: "get", //send it through get method
+        contentType: "application/json",
+        data: {
+          resource: resource._id,
+          action: "unlike",
+        },
+        success: function (response) {
+          $(elementThumbs).attr("class", "far fa-thumbs-up");
+          document.getElementById(id).innerHTML = "&nbsp;" + noOfLikes;
+        },
+        error: function (xhr) {
+          console.log("in like error");
+        },
+      });
+    }
+  }
+
+  function clickDislike(resource, noOfDislikes, flag) {
+    var id = "dislike" + resource._id;
+
+    var elementThumbs = document.getElementById(id);
+    var thumbsClassString = $(elementThumbs).attr("class");
+    var thumbsClassList = thumbsClassString.split(" ");
+    var thumbsClass = thumbsClassList[1];
+
+    if (thumbsClass === "fas") {
+      $.ajax({
+        url: "/resources/updateDislikes",
+        type: "get",
+        contentType: "application/json",
+        data: {
+          resource: resource._id,
+          action: "dislike",
+        },
+        success: function (response) {
+          $(elementThumbs).attr("class", "far fa-thumbs-down");
+          noOfDislikes += 1;
+          document.getElementById(id).innerHTML = "&nbsp;" + noOfDislikes;
+        },
+        error: function (xhr) {
+          console.log("in like error");
+        },
+      });
+    } else {
+      $.ajax({
+        url: "/resources/updateDislikes",
+        type: "get",
+        contentType: "application/json",
+        data: {
+          resource: resource._id,
+          action: "undislike",
+        },
+        success: function (response) {
+          $(elementThumbs).attr("class", "fas fa-thumbs-down");
+          document.getElementById(id).innerHTML = "&nbsp;" + noOfDislikes;
+        },
+        error: function (xhr) {
+          console.log("in like error");
+        },
+      });
+    }
+  }
+
+  function clickCompleted(resource) {
+    var id = "completed" + resource._id;
+    var buttonId = "btnCompleted" + resource._id;
+
+    var elementCompleted = document.getElementById(id);
+
+    $.ajax({
+      url: "/resources/updateCompleted",
+      type: "get", //send it through get method
+      contentType: "application/json",
+      data: {
+        resource: resource._id,
+      },
+      success: function (response) {
+        $(elementCompleted).attr("class", "fas fa-check-circle");
+        document.getElementById(id).innerHTML = "&nbsp;completed";
+        document.getElementById(buttonId).disabled = true;
+      },
+      error: function (xhr) {
+        console.log("in like error");
+      },
+    });
+  }
+
+  function renderFile(resource) {
+    $.ajax({
+      url: "/resources/getResource",
+      type: "get", //send it through get method
+      contentType: "application/pdf",
+      responseType: "blob",
+      data: {
+        resource: resource._id,
+      },
+      success: function (response) {
+        //Do Something
+        var re = /(?:\.([^.]+))?$/;
+
+        const filename = resource.resourceName;
+
+        var ext = re.exec(filename)[1];
+        var txtModal = "";
+
+        if (ext == "txt") {
+          txtModal =
+            '<div class="modal fade" id="txtModal"><div class="modal-dialog" role="document" style="max-width: 100%; margin-left: 150px; margin-right: 150px;"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body"><p>' +
+            response +
+            '</p></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button></div></div></div></div>';
+        } else {
+          var location = resource.resourceLocation.originalLocation;
+          var locationList = location.split("/");
+          var originalName = locationList[locationList.length - 1];
+
+          txtModal =
+            '<div class="modal fade" id="txtModal"><div class="modal-dialog" role="document" style="max-width: 100%; margin-left: 150px; margin-right: 150px;"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body"><iframe src="../datastore/raw/' +
+            originalName +
+            '" width="100%" height="750px;" style="overflow: auto;"></iframe></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button></div></div></div></div>';
+        }
+
+        const divTxtModal = document.getElementById("divTxtModal");
+        divTxtModal.innerHTML = txtModal;
+
+        $("#txtModal").modal("show");
+      },
+      error: function (xhr) {
+        //Do Something to handle error
+        console.log("in render file error");
+      },
+    });
+  }
+</script>

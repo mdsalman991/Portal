@@ -1,0 +1,133 @@
+<div id="container" class="container-fluid" style="margin-top: 16px">
+  <div class="row">
+    <div class="col-2"></div>
+    <div class="col-8 mx-auto">
+      <div>
+        <center>
+          <legend>Select Resources for Map Generation</legend>
+        </center>
+      </div>
+      <form action="/learningMaps/createMap" method="POST">
+        <div class="card card-body">
+          <div class="form-group row">
+            <div class="col-sm-2">
+              <label for="mapName" class="col-form-label">Map Name</label>
+            </div>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="mapName" placeholder="Enter map name" required="true" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-sm-2">
+              <label for="mapDescription" class="col-form-label">Map Description</label>
+            </div>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="mapDescription" placeholder="Enter map description"
+                required="true" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-sm-2">
+              <label for="numberOfLevels" class="col-form-label">Number of levels</label>
+            </div>
+            <div class="col-sm-8">
+              <input type="number" class="form-control" name="numberOfLevels"
+                placeholder="Enter the number of levels in the map" required="true" />
+            </div>
+          </div>
+        </div>
+
+        <div id="resourceGroup">
+          <% resourceGroupList.forEach((resourceGroup,index) => { %>
+          <div class="form-check" id="resource-group-div-<%-index%>">
+            <input id="group-<%= index %>" class="form-check-input" type="checkbox" name="resourceGroups"
+              value="<%=resourceGroup.resourceGroupName%>" />
+            <div class="card border-dark mb-8" id="resourceGroupCard" style="margin-top: 20px; margin-bottom: 20px">
+              <div class="card-body">
+                <h4 class="card-title" style="margin-bottom: 0.01rem">
+                  <%= resourceGroup.resourceGroupName %>
+                </h4>
+                <p class="card-text">
+                  <% if(resourceGroup.resourceGroupDescription.length > 20) { %>
+                  <%= resourceGroup.resourceGroupDescription.substring(0, 100) +
+                  "..." %> <% } else{ %> <%=
+                  resourceGroup.resourceGroupDescription %> <% } %>
+                </p>
+                <p class="card-text" style="margin-bottom: 0.01rem">
+                  This resource group contains <%=
+                  resourceGroup.resources.length %> documents
+                </p>
+                <button class="btn btn-primary" style="margin-top: 16px" type="button" data-toggle="collapse"
+                  data-target="#documents-<%= index %>" aria-expanded="false" aria-controls="documents-<%= index %>"
+                  onclick="((event) => {
+                    if(this.innerHTML.trim() == 'Show Documents') {
+                      this.innerHTML = 'Hide Documents';
+                    } else {
+                      this.innerHTML = 'Show Documents';
+                    } 
+                  })();">
+                  Show Documents
+                </button>
+                <div id="documents-<%=index %>" class="collapse" style="margin-left: 16px; margin-right: 16px">
+                  <% resourceGroup.resources.forEach(resource => { %>
+                  <div class="form-check">
+                    <input 
+                      class="form-check-input" 
+                      type="checkbox" 
+                      name="resources" 
+                      value="<%=resource.resourceId%>" 
+
+                      />
+                    <div class="card border-dark mb-6" style="
+                        max-width: 60rem;
+                        margin-top: 20px;
+                        margin-bottom: 20px;
+                      ">
+                      <div class="card-body">
+                        <h4 class="card-title" style="margin-bottom: 0.01rem">
+                          <%= resource.resourceName %>
+                        </h4>
+                        <p class="card-text">
+                          Resource Type: <%= resource.resourceType %>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <% }) %>
+                </div>
+              </div>
+            </div>
+          </div>
+          <script>
+            $(() => {
+              $("#group-<%= index %>").change(function () {
+                // $("#documents-<%=index %> input[name='resources']").attr('checked', this.checked);
+                $("#documents-<%=index %> input[name='resources']").prop('checked', this.checked);
+              });
+
+              $("#documents-<%=index %> input[name='resources']").change(function (event) {
+                $("#group-<%= index %>").prop('checked', $(
+                  "#documents-<%=index %> input[name=resources]:not(:checked)").length === 0 ? true : false);
+              });
+            });
+          </script>
+
+          <% }); %>
+        </div>
+
+        <center style="margin-top: 16px; margin-bottom: 16px">
+          <input type="submit" value="Generate Map" class="btn btn-primary" />
+        </center>
+      </form>
+    </div>
+    <div class="col-2"></div>
+  </div>
+</div>
+
+<script>
+  $("#search-input").keyup(function (event) {
+    searchText = $("#search-input").val();
+
+  });
+</script>

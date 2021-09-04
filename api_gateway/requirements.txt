@@ -1,0 +1,15 @@
+celery==4.4.7
+uvicorn==0.12.2
+redis==3.5.3
+fastapi==0.61.2
+pymongo==3.11.0
+pandas==1.1.0
+flower==0.9.5
+simple-codecs==1.0
+numpy==1.18.5
+textblob==0.15.3
+emoji==1.2.0
+nltk==3.5
+pydantic==1.7.3
+beautifulsoup4==4.9.3
+scikit_learn==0.24.1
